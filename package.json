@@ -4,7 +4,8 @@
   "description": "Generate config files and boilerplate with ease",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint \".\" --fix && prettier \".\" --write",
+    "test": "echo \"No test script yet\""
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,14 @@
   "bugs": {
     "url": "https://github.com/EmmaGoodliffe/dotconfig/issues"
   },
-  "homepage": "https://github.com/EmmaGoodliffe/dotconfig#readme"
+  "homepage": "https://github.com/EmmaGoodliffe/dotconfig#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
+    "eslint": "^7.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.0",
+    "prettier": "^2.2.1",
+    "typescript": "^4.1.3"
+  }
 }
