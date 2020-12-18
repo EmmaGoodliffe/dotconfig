@@ -1,0 +1,19 @@
+{
+  "name": "dotconfig",
+  "version": "1.0.0",
+  "description": "Generate config files and boilerplate with ease",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EmmaGoodliffe/dotconfig.git"
+  },
+  "author": "Emma Goodliffe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EmmaGoodliffe/dotconfig/issues"
+  },
+  "homepage": "https://github.com/EmmaGoodliffe/dotconfig#readme"
+}

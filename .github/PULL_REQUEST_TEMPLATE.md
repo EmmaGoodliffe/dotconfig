@@ -1,11 +1,15 @@
-# Purpose of pull request
+# Related bugs and feature requests
 
-> A clear and concise description of why this PR should be accepted (e.g. link to an issue, etc.)...
+<!-- optional, write here -->
+
+# Describe the pull request
 
 <!-- write here -->
 
 # Documentation
 
-> Some documentation or an example of how these changes are used
+<!-- optional, write here -->
 
-<!-- write here -->
+# Additional context
+
+<!-- optional, write here -->
