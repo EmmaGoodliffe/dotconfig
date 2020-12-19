@@ -6,13 +6,27 @@ import { argv } from "yargs";
 
 const { readFile, writeFile } = promises;
 
-interface Templates {
-  [pkg: string]: {
-    files: {
-      file: string;
-      url?: string;
-    }[];
+interface File_ {
+  file: string;
+  url?: string;
+}
+
+interface Integration {
+  integration: string[];
+  template: Template;
+}
+
+interface Template {
+  files?: File_[];
+  integrations?: Integration[];
+  npm?: string[];
+  npx?: string[];
+  extensions?: {
+    [name: string]: Template;
   };
+}
+interface Templates {
+  [pkg: string]: Template;
 }
 
 const templatesPath = resolve(__dirname, "../templates.json");
@@ -54,7 +68,7 @@ const run = async (outputDir: string | number) => {
   );
   const selectedTemplates = selectedPackages.map(pkg => templates[pkg]);
   const pkgPromises = selectedTemplates.map(template => {
-    const filePromises = template.files.map(async file => {
+    const filePromises = template.files?.map(async file => {
       const url = file.url || defaultUrl + file.file;
       const raw = await fetch(url);
       const text = await raw.text();
@@ -63,7 +77,7 @@ const run = async (outputDir: string | number) => {
       recursivelyCreateDir(dir);
       await writeFile(path, text);
     });
-    return Promise.all(filePromises);
+    return Promise.all(filePromises || []);
   });
   await Promise.all(pkgPromises);
 };
