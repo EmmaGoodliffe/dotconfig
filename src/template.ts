@@ -1,5 +1,6 @@
 import { existsSync } from "fs";
 import { resolve } from "path";
+import runChanges from "./change";
 import { readFile, writeFile, writeFiles } from "./io";
 import { Template } from "./types";
 

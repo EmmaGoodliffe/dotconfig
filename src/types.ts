@@ -36,7 +36,7 @@ export interface Template {
   integrations?: Integration[];
   dependencies?: string[];
   devDependencies?: string[];
-  npx?: string[];
+  commands?: string[];
   extensions?: {
     [name: string]: Template;
   };
