@@ -1,59 +1,57 @@
 {
-  "templates": {
-    "eslint": {
-      "files": [
-        { "file": ".eslintrc.json", "url": "../content/eslint/.eslintrc.json" }
-      ],
-      "npm": ["eslint", "eslint-plugin-import"],
-      "integrations": [
-        {
-          "integration": ["prettier"],
-          "template": {
-            "files": [
-              {
-                "file": ".eslintrc.json",
-                "url": "../content/eslint/prettier.eslintrc.json"
-              }
-            ]
-          },
-          "npm": ["eslint-plugin-prettier"]
+  "eslint": {
+    "files": [
+      { "file": ".eslintrc.json", "url": "../content/eslint/.eslintrc.json" }
+    ],
+    "devDependencies": ["eslint", "eslint-plugin-import"],
+    "integrations": [
+      {
+        "integration": ["prettier"],
+        "template": {
+          "files": [
+            {
+              "file": ".eslintrc.json",
+              "url": "../content/eslint/prettier.eslintrc.json"
+            }
+          ]
         },
-        {
-          "integration": ["typescript"],
-          "template": {
-            "files": [
-              {
-                "file": ".eslintrc.json",
-                "url": "../content/eslint/typescript.eslintrc.json"
-              }
-            ],
-            "npm": [
-              "@typescript-eslint/eslint-plugin",
-              "@typescript-eslint/parser"
-            ]
-          }
-        },
-        {
-          "integration": ["prettier", "typescript"],
-          "template": { "files": [{ "file": ".eslintrc.json" }] }
+        "devDependencies": ["eslint-plugin-prettier"]
+      },
+      {
+        "integration": ["typescript"],
+        "template": {
+          "files": [
+            {
+              "file": ".eslintrc.json",
+              "url": "../content/eslint/typescript.eslintrc.json"
+            }
+          ],
+          "devDependencies": [
+            "@typescript-eslint/eslint-plugin",
+            "@typescript-eslint/parser"
+          ]
         }
-      ]
-    },
-    "prettier": { "files": [{ "file": ".prettierrc" }], "npm": ["prettier"] },
-    "git": { "files": [{ "file": ".gitignore" }] },
-    "github": {
-      "files": [
-        { "file": ".github/ISSUE_TEMPLATE/bug_report.md" },
-        { "file": ".github/ISSUE_TEMPLATE/feature_request.md" },
-        { "file": ".github/PULL_REQUEST_TEMPLATE.md" }
-      ],
-      "extensions": {
-        "workflows": { "files": [{ "file": ".github/workflows/ci.yml" }] }
+      },
+      {
+        "integration": ["prettier", "typescript"],
+        "template": { "files": [{ "file": ".eslintrc.json" }] }
       }
-    },
-    "typescript": {
-      "npm": ["typescript"],
-      "npx": "tsc --init"
+    ]
+  },
+  "prettier": { "files": [{ "file": ".prettierrc" }], "npm": ["prettier"] },
+  "git": { "files": [{ "file": ".gitignore" }] },
+  "github": {
+    "files": [
+      { "file": ".github/ISSUE_TEMPLATE/bug_report.md" },
+      { "file": ".github/ISSUE_TEMPLATE/feature_request.md" },
+      { "file": ".github/PULL_REQUEST_TEMPLATE.md" }
+    ],
+    "extensions": {
+      "workflows": { "files": [{ "file": ".github/workflows/ci.yml" }] }
     }
+  },
+  "typescript": {
+    "devDependencies": ["typescript"],
+    "commands": ["npx tsc --init"]
   }
 }
