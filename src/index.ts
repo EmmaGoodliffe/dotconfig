@@ -3,10 +3,12 @@ import { checkboxes } from "input";
 import { dirname, resolve } from "path";
 import { argv } from "yargs";
 import { readFile } from "./io";
+import runSchema from "./schema";
 import runTemplate from "./template";
 import { Templates } from "./types";
 
 const templatesPath = resolve(__dirname, "./data.json");
+const schemaPath = resolve(__dirname, "../dist/schema.json");
 
 const run = async (outputDir: string | number) => {
   if (typeof outputDir !== "string") {
@@ -24,6 +26,11 @@ const run = async (outputDir: string | number) => {
   const templatesBuffer = await readFile(templatesPath);
   const rawTemplates = templatesBuffer.toString();
   const templates: Templates = JSON.parse(rawTemplates);
+  try {
+    runSchema(templates, schemaPath);
+  } catch (err) {
+    throw `The data in ${templatesPath} does not match the automatically generated schema: ${err}`;
+  }
   const allPackages = Object.keys(templates);
   const selectedPackages = await checkboxes<string>(
     "Select which packages to auto-configure",

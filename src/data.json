@@ -7,22 +7,26 @@
     "integrations": [
       {
         "integration": ["prettier"],
-        "overridesJSON": {
-          "file": ".eslintrc.json",
-          "changes": [
-            {
-              "type": "Array",
-              "key": "plugins",
-              "modifier": { "add": "prettier" }
-            },
-            {
-              "type": "Object",
-              "key": "rules",
-              "modifier": { "set": { "prettier/prettier": "error" } }
-            }
-          ]
-        },
-        "devDependencies": ["eslint-plugin-prettier"]
+        "overridesJSON": [
+          {
+            "file": ".eslintrc.json",
+            "changes": [
+              {
+                "type": "Array",
+                "key": "plugins",
+                "modifier": { "add": "prettier" }
+              },
+              {
+                "type": "Object",
+                "key": "rules",
+                "modifier": { "set": { "prettier/prettier": "error" } }
+              }
+            ]
+          }
+        ],
+        "template": {
+          "devDependencies": ["eslint-plugin-prettier"]
+        }
       },
       {
         "integration": ["typescript"],
@@ -35,7 +39,10 @@
       }
     ]
   },
-  "prettier": { "files": [{ "file": ".prettierrc" }], "npm": ["prettier"] },
+  "prettier": {
+    "files": [{ "file": ".prettierrc" }],
+    "devDependencies": ["prettier"]
+  },
   "git": { "files": [{ "file": ".gitignore" }] },
   "github": {
     "files": [

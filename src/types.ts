@@ -28,7 +28,7 @@ export interface File_ {
 interface Integration {
   integration: string[];
   template: Template;
-  overridesJSON: { file: string; changes: Change[] }[];
+  overridesJSON?: { file: string; changes: Change[] }[];
 }
 
 export interface Template {

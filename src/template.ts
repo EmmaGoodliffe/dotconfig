@@ -24,18 +24,20 @@ const runTemplate = async (
       if (useIntegration) {
         await writeFiles(integration.template.files, outputDir);
         // TODO: Complete other parts of template
-        for (const override of integration.overridesJSON) {
-          const { file, changes } = override;
-          const path = resolve(outputDir, file);
-          if (!existsSync(file)) {
-            throw `${pkg}~${integration.integration} expected ${path} to exist`;
+        if (integration.overridesJSON) {
+          for (const override of integration.overridesJSON) {
+            const { file, changes } = override;
+            const path = resolve(outputDir, file);
+            if (!existsSync(file)) {
+              throw `${pkg}~${integration.integration} expected ${path} to exist`;
+            }
+            const beforeBuffer = await readFile(file);
+            const beforeRaw = beforeBuffer.toString();
+            const before = JSON.parse(beforeRaw);
+            const after = runChanges(before, changes);
+            const afterRaw = JSON.stringify(after);
+            writeFile(file, afterRaw);
           }
-          const beforeBuffer = await readFile(file);
-          const beforeRaw = beforeBuffer.toString();
-          const before = JSON.parse(beforeRaw);
-          const after = runChanges(before, changes);
-          const afterRaw = JSON.stringify(after);
-          writeFile(file, afterRaw);
         }
       }
     }
