@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, promises } from "fs";
+import { confirm } from "input";
 import fetch from "node-fetch";
 import { dirname, resolve } from "path";
 import { parse } from "url";
 import { File_ } from "./types";
 
-export const { readFile, writeFile } = promises;
+const { readFile, writeFile } = promises;
 
 const defaultUrl =
   "https://raw.githubusercontent.com/EmmaGoodliffe/default/master/";
@@ -48,7 +49,12 @@ export const writeFiles = (
     const path = resolve(outputDir, file.file);
     const dir = dirname(path);
     recursivelyCreateDir(dir);
-    await writeFile(path, raw);
+    const shouldWrite =
+      !existsSync(path) ||
+      (await confirm(`${path} already exists. Do you want to override it?`, {
+        default: false,
+      }));
+    shouldWrite && (await writeFile(path, raw));
   });
   return Promise.all(promises);
 };

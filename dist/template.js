@@ -48,10 +48,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs_1 = require("fs");
 var path_1 = require("path");
-var change_1 = __importDefault(require("./change"));
+var changes_1 = __importDefault(require("./changes"));
 var io_1 = require("./io");
+var readFile = fs_1.promises.readFile, writeFile = fs_1.promises.writeFile;
 var runTemplate = function (pkg, template, selectedPackages, outputDir) { return __awaiter(void 0, void 0, void 0, function () {
-    var deps, devDeps, _i, _a, integration, useIntegration, _b, _c, override, file, changes, path, beforeBuffer, beforeRaw, before, after, afterRaw, _d, _e, _f, extension, question, answer, extTemplate, _g, dependencies, devDependencies;
+    var deps, devDeps, _i, _a, integration, useIntegration, _b, _c, override, file, theChanges, path, beforeBuffer, beforeRaw, before, after, afterRaw, _d, _e, _f, extension, question, answer, extTemplate, _g, dependencies, devDependencies;
     return __generator(this, function (_h) {
         switch (_h.label) {
             case 0:
@@ -79,19 +80,20 @@ var runTemplate = function (pkg, template, selectedPackages, outputDir) { return
             case 4:
                 if (!(_b < _c.length)) return [3 /*break*/, 7];
                 override = _c[_b];
-                file = override.file, changes = override.changes;
+                file = override.file;
+                theChanges = override.changes;
                 path = path_1.resolve(outputDir, file);
                 if (!fs_1.existsSync(file)) {
                     throw pkg + "~" + integration.integration + " expected " + path + " to exist";
                 }
-                return [4 /*yield*/, io_1.readFile(file)];
+                return [4 /*yield*/, readFile(file)];
             case 5:
                 beforeBuffer = _h.sent();
                 beforeRaw = beforeBuffer.toString();
                 before = JSON.parse(beforeRaw);
-                after = change_1.default(before, changes);
+                after = changes_1.default(before, theChanges);
                 afterRaw = JSON.stringify(after);
-                io_1.writeFile(file, afterRaw);
+                writeFile(file, afterRaw);
                 _h.label = 6;
             case 6:
                 _b++;

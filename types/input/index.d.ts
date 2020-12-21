@@ -10,4 +10,8 @@ declare module "input" {
     choices: Choice<T>[],
     options?: { validate?: (answer: T[]) => boolean },
   ): Promise<T[]>;
+  function confirm(
+    label: string,
+    options?: { default?: boolean; validate?: (answer: boolean) => boolean },
+  ): Promise<boolean>;
 }

@@ -18,7 +18,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var runChanges = function (input, changes) {
+var changes = function (input, changes) {
     var result = __assign({}, input);
     for (var _i = 0, changes_1 = changes; _i < changes_1.length; _i++) {
         var change = changes_1[_i];
@@ -38,4 +38,4 @@ var runChanges = function (input, changes) {
     }
     return result;
 };
-exports.default = runChanges;
+exports.default = changes;

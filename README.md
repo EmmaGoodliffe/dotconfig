@@ -12,3 +12,4 @@ Generate config files and boilerplate with ease
 - Tailwind
 - API Extractor
 - Typescript
+- Jest

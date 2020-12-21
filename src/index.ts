@@ -1,11 +1,12 @@
-import { existsSync, mkdirSync } from "fs";
+import { existsSync, mkdirSync, promises } from "fs";
 import { checkboxes } from "input";
 import { dirname, resolve } from "path";
 import { argv } from "yargs";
-import { readFile } from "./io";
-import runSchema from "./schema";
-import runTemplate from "./template";
+import schema from "./schema";
+import template from "./template";
 import { Templates } from "./types";
+
+const { readFile } = promises;
 
 const templatesPath = resolve(__dirname, "./data.json");
 const schemaPath = resolve(__dirname, "../dist/schema.json");
@@ -27,7 +28,7 @@ const run = async (outputDir: string | number) => {
   const rawTemplates = templatesBuffer.toString();
   const templates: Templates = JSON.parse(rawTemplates);
   try {
-    runSchema(templates, schemaPath);
+    schema(templates, schemaPath);
   } catch (err) {
     throw `The data in ${templatesPath} does not match the automatically generated schema: ${err}`;
   }
@@ -41,10 +42,10 @@ const run = async (outputDir: string | number) => {
   const allDevDeps: string[] = [];
   for (let i = 0; i < selectedPackages.length; i++) {
     const pkg = selectedPackages[i];
-    const template = selectedTemplates[i];
-    const { dependencies, devDependencies } = await runTemplate(
+    const selectedTemplate = selectedTemplates[i];
+    const { dependencies, devDependencies } = await template(
       pkg,
-      template,
+      selectedTemplate,
       selectedPackages,
       absoluteOutputDir,
     );

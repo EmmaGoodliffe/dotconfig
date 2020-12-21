@@ -23,9 +23,9 @@ var parseDataPath = function (dataPath) {
     var result = removeDotPrefix(elements.join(""));
     return result;
 };
-var runSchema = function (data, schemaPath) {
-    var schema = JSON.parse(fs_1.readFileSync(schemaPath).toString());
-    var validate = ajv.compile(schema);
+var schema = function (data, schemaPath) {
+    var theSchema = JSON.parse(fs_1.readFileSync(schemaPath).toString());
+    var validate = ajv.compile(theSchema);
     var result = validate(data);
     if (!result) {
         if (!validate.errors) {
@@ -38,4 +38,4 @@ var runSchema = function (data, schemaPath) {
         }
     }
 };
-exports.default = runSchema;
+exports.default = schema;

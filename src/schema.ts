@@ -22,10 +22,10 @@ const parseDataPath = (dataPath: string) => {
   return result;
 };
 
-const runSchema = (data: Record<string, unknown>, schemaPath: string): void => {
-  const schema = JSON.parse(readFileSync(schemaPath).toString());
+const schema = (data: Record<string, unknown>, schemaPath: string): void => {
+  const theSchema = JSON.parse(readFileSync(schemaPath).toString());
 
-  const validate = ajv.compile(schema);
+  const validate = ajv.compile(theSchema);
   const result = validate(data);
 
   if (!result) {
@@ -41,4 +41,4 @@ const runSchema = (data: Record<string, unknown>, schemaPath: string): void => {
   }
 };
 
-export default runSchema;
+export default schema;

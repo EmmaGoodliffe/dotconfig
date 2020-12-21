@@ -43,13 +43,13 @@ var fs_1 = require("fs");
 var input_1 = require("input");
 var path_1 = require("path");
 var yargs_1 = require("yargs");
-var io_1 = require("./io");
 var schema_1 = __importDefault(require("./schema"));
 var template_1 = __importDefault(require("./template"));
+var readFile = fs_1.promises.readFile;
 var templatesPath = path_1.resolve(__dirname, "./data.json");
 var schemaPath = path_1.resolve(__dirname, "../dist/schema.json");
 var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, function () {
-    var absoluteOutputDir, parentDir, templatesBuffer, rawTemplates, templates, allPackages, selectedPackages, selectedTemplates, allDeps, allDevDeps, i, pkg, template, _a, dependencies, devDependencies, commandsToRun;
+    var absoluteOutputDir, parentDir, templatesBuffer, rawTemplates, templates, allPackages, selectedPackages, selectedTemplates, allDeps, allDevDeps, i, pkg, selectedTemplate, _a, dependencies, devDependencies, commandsToRun;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -66,7 +66,7 @@ var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, functi
                         throw "Expected " + parentDir + " to exist";
                     }
                 }
-                return [4 /*yield*/, io_1.readFile(templatesPath)];
+                return [4 /*yield*/, readFile(templatesPath)];
             case 1:
                 templatesBuffer = _b.sent();
                 rawTemplates = templatesBuffer.toString();
@@ -89,10 +89,12 @@ var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, functi
             case 3:
                 if (!(i < selectedPackages.length)) return [3 /*break*/, 6];
                 pkg = selectedPackages[i];
-                template = selectedTemplates[i];
-                return [4 /*yield*/, template_1.default(pkg, template, selectedPackages, absoluteOutputDir)];
+                selectedTemplate = selectedTemplates[i];
+                console.time("" + i);
+                return [4 /*yield*/, template_1.default(pkg, selectedTemplate, selectedPackages, absoluteOutputDir)];
             case 4:
                 _a = _b.sent(), dependencies = _a.dependencies, devDependencies = _a.devDependencies;
+                console.timeEnd("" + i);
                 allDeps.push.apply(allDeps, dependencies);
                 allDevDeps.push.apply(allDevDeps, devDependencies);
                 _b.label = 5;

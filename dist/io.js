@@ -39,12 +39,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.writeFiles = exports.writeFile = exports.readFile = void 0;
+exports.writeFiles = void 0;
 var fs_1 = require("fs");
+var input_1 = require("input");
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var path_1 = require("path");
 var url_1 = require("url");
-exports.readFile = fs_1.promises.readFile, exports.writeFile = fs_1.promises.writeFile;
+var readFile = fs_1.promises.readFile, writeFile = fs_1.promises.writeFile;
 var defaultUrl = "https://raw.githubusercontent.com/EmmaGoodliffe/default/master/";
 var recursivelyCreateDir = function (path) {
     var parent = path_1.dirname(path);
@@ -70,7 +71,7 @@ var getFile = function (url) { return __awaiter(void 0, void 0, void 0, function
             case 0:
                 isFile = url_1.parse(url).protocol === null;
                 if (!isFile) return [3 /*break*/, 2];
-                return [4 /*yield*/, exports.readFile(path_1.resolve(__dirname, url))];
+                return [4 /*yield*/, readFile(path_1.resolve(__dirname, url))];
             case 1:
                 buffer = _a.sent();
                 raw = buffer.toString();
@@ -88,20 +89,35 @@ var getFile = function (url) { return __awaiter(void 0, void 0, void 0, function
 var writeFiles = function (files, outputDir) {
     if (files === void 0) { files = []; }
     var promises = files.map(function (file) { return __awaiter(void 0, void 0, void 0, function () {
-        var url, raw, path, dir;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var url, raw, path, dir, shouldWrite, _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     url = file.url || defaultUrl + file.file;
                     return [4 /*yield*/, getFile(url)];
                 case 1:
-                    raw = _a.sent();
+                    raw = _c.sent();
                     path = path_1.resolve(outputDir, file.file);
                     dir = path_1.dirname(path);
                     recursivelyCreateDir(dir);
-                    return [4 /*yield*/, exports.writeFile(path, raw)];
+                    _a = !fs_1.existsSync(path);
+                    if (_a) return [3 /*break*/, 3];
+                    return [4 /*yield*/, input_1.confirm(path + " already exists. Do you want to override it?", {
+                            default: false,
+                        })];
                 case 2:
-                    _a.sent();
+                    _a = (_c.sent());
+                    _c.label = 3;
+                case 3:
+                    shouldWrite = _a;
+                    _b = shouldWrite;
+                    if (!_b) return [3 /*break*/, 5];
+                    return [4 /*yield*/, writeFile(path, raw)];
+                case 4:
+                    _b = (_c.sent());
+                    _c.label = 5;
+                case 5:
+                    _b;
                     return [2 /*return*/];
             }
         });

@@ -1,6 +1,6 @@
 import { Change } from "./types";
 
-const runChanges = (
+const changes = (
   input: Record<string, unknown>,
   changes: Change[],
 ): Record<string, unknown> => {
@@ -14,6 +14,9 @@ const runChanges = (
       }
     } else if (change.type === "Object") {
       if (change.modifier.set !== undefined) {
+        if (change.key.includes(".")) {
+          throw `Compound keys are not supported yet. Received: ${change.key}`;
+        }
         const previousValues = result[change.key] as Record<string, unknown>;
         result[change.key] = { ...previousValues, ...change.modifier.set };
       }
@@ -22,4 +25,4 @@ const runChanges = (
   return result;
 };
 
-export default runChanges;
+export default changes;

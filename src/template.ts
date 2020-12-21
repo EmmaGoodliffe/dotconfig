@@ -1,23 +1,25 @@
-import { existsSync } from "fs";
+import { existsSync, promises } from "fs";
 import { resolve } from "path";
-import runChanges from "./change";
-import { readFile, writeFile, writeFiles } from "./io";
+import changes from "./changes";
+import { writeFiles } from "./io";
 import { Template } from "./types";
 
-const runTemplate = async (
+const { readFile, writeFile } = promises;
+
+const template = async (
   pkg: string,
-  template: Template,
+  theTemplate: Template,
   selectedPackages: string[],
   outputDir: string,
 ): Promise<{
   dependencies: string[];
   devDependencies: string[];
 }> => {
-  const deps = template.dependencies ? [...template.dependencies] : [];
-  const devDeps = template.devDependencies ? [...template.devDependencies] : [];
-  await writeFiles(template.files, outputDir);
-  if (template.integrations) {
-    for (const integration of template.integrations) {
+  const deps = [...(theTemplate.dependencies || [])];
+  const devDeps = [...(theTemplate.devDependencies || [])];
+  await writeFiles(theTemplate.files, outputDir);
+  if (theTemplate.integrations) {
+    for (const integration of theTemplate.integrations) {
       const useIntegration = integration.integration.every(pkg =>
         selectedPackages.includes(pkg),
       );
@@ -26,7 +28,8 @@ const runTemplate = async (
         // TODO: Complete other parts of template
         if (integration.overridesJSON) {
           for (const override of integration.overridesJSON) {
-            const { file, changes } = override;
+            const { file } = override;
+            const theChanges = override.changes;
             const path = resolve(outputDir, file);
             if (!existsSync(file)) {
               throw `${pkg}~${integration.integration} expected ${path} to exist`;
@@ -34,23 +37,23 @@ const runTemplate = async (
             const beforeBuffer = await readFile(file);
             const beforeRaw = beforeBuffer.toString();
             const before = JSON.parse(beforeRaw);
-            const after = runChanges(before, changes);
+            const after = changes(before, theChanges);
             const afterRaw = JSON.stringify(after);
-            writeFile(file, afterRaw);
+            await writeFile(file, afterRaw);
           }
         }
       }
     }
   }
-  if (template.extensions) {
-    for (const extension in template.extensions) {
+  if (theTemplate.extensions) {
+    for (const extension in theTemplate.extensions) {
       const question = `Do you want to set up ${pkg} with ${extension}`;
       console.log({ question });
       // TODO: ask question
       const answer = false;
       if (answer) {
-        const extTemplate = template.extensions[extension];
-        const { dependencies, devDependencies } = await runTemplate(
+        const extTemplate = theTemplate.extensions[extension];
+        const { dependencies, devDependencies } = await template(
           `${pkg}:${extension}`,
           extTemplate,
           selectedPackages,
@@ -67,4 +70,4 @@ const runTemplate = async (
   };
 };
 
-export default runTemplate;
+export default template;
