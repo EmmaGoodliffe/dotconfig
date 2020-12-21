@@ -4,7 +4,6 @@
   "description": "Generate config files and boilerplate with ease",
   "main": "index.js",
   "scripts": {
-    "build:schema": "ts-json-schema-generator",
     "build": "rimraf dist && tsc && ts-node scripts/build",
     "dev": "ts-node src/index.ts \"output\"",
     "lint": "eslint \".\" --fix && prettier \".\" --write",
