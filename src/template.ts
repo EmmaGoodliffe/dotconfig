@@ -34,12 +34,12 @@ const template = async (
             if (!existsSync(file)) {
               throw `${pkg}~${integration.integration} expected ${path} to exist`;
             }
-            const beforeBuffer = await readFile(file);
+            const beforeBuffer = await readFile(path);
             const beforeRaw = beforeBuffer.toString();
             const before = JSON.parse(beforeRaw);
             const after = changes(before, theChanges);
             const afterRaw = JSON.stringify(after);
-            await writeFile(file, afterRaw);
+            await writeFile(path, afterRaw);
           }
         }
       }
