@@ -53,8 +53,12 @@ const run = async (outputDir: string | number) => {
     allDevDeps.push(...devDependencies);
   }
   const commandsToRun = ["npm init"];
-  allDeps.length && commandsToRun.push(`npm i ${allDeps.join(" ")}`);
-  allDevDeps.length && commandsToRun.push(`npm i -D ${allDevDeps.join(" ")}`);
+  const allUniqueDeps = Array.from(new Set(allDeps));
+  const allUniqueDevDeps = Array.from(new Set(allDevDeps));
+  const depsCommand = `npm i ${allUniqueDeps.join(" ")}`;
+  const devDepsCommand = `npm i -D ${allUniqueDevDeps.join(" ")}`;
+  allUniqueDeps.length && commandsToRun.push(depsCommand);
+  allUniqueDevDeps.length && commandsToRun.push(devDepsCommand);
   console.log({ commandsToRun });
 };
 

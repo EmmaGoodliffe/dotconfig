@@ -1,9 +1,11 @@
 {
   "eslint": {
+    "commands": [],
+    "dependencies": [],
+    "devDependencies": ["eslint", "eslint-plugin-import"],
     "files": [
       { "file": ".eslintrc.json", "url": "../content/eslint/.eslintrc.json" }
     ],
-    "devDependencies": ["eslint", "eslint-plugin-import"],
     "integrations": [
       {
         "integration": ["prettier"],
@@ -25,12 +27,16 @@
           }
         ],
         "template": {
+          "commands": [],
+          "dependencies": [],
           "devDependencies": ["eslint-plugin-prettier"]
         }
       },
       {
         "integration": ["typescript"],
         "template": {
+          "commands": [],
+          "dependencies": [],
           "devDependencies": [
             "@typescript-eslint/eslint-plugin",
             "@typescript-eslint/parser"
@@ -40,11 +46,21 @@
     ]
   },
   "prettier": {
-    "files": [{ "file": ".prettierrc" }],
-    "devDependencies": ["prettier"]
+    "commands": [],
+    "dependencies": [],
+    "devDependencies": ["prettier"],
+    "files": [{ "file": ".prettierrc" }]
   },
-  "git": { "files": [{ "file": ".gitignore" }] },
+  "git": {
+    "commands": [],
+    "dependencies": [],
+    "devDependencies": ["prettier"],
+    "files": [{ "file": ".gitignore" }]
+  },
   "github": {
+    "commands": [],
+    "dependencies": [],
+    "devDependencies": ["prettier"],
     "files": [
       { "file": ".github/ISSUE_TEMPLATE/bug_report.md" },
       { "file": ".github/ISSUE_TEMPLATE/feature_request.md" },
@@ -52,13 +68,19 @@
     ],
     "extensions": {
       "workflows": {
-        "template": { "files": [{ "file": ".github/workflows/ci.yml" }] },
+        "template": {
+          "commands": [],
+          "dependencies": [],
+          "devDependencies": ["prettier"],
+          "files": [{ "file": ".github/workflows/ci.yml" }]
+        },
         "default": false
       }
     }
   },
   "typescript": {
-    "devDependencies": ["typescript"],
-    "commands": ["npx tsc --init"]
+    "commands": ["npx tsc --init"],
+    "dependencies": [],
+    "devDependencies": ["typescript"]
   }
 }

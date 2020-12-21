@@ -49,7 +49,7 @@ var readFile = fs_1.promises.readFile;
 var templatesPath = path_1.resolve(__dirname, "./data.json");
 var schemaPath = path_1.resolve(__dirname, "../dist/schema.json");
 var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, function () {
-    var absoluteOutputDir, parentDir, templatesBuffer, rawTemplates, templates, allPackages, selectedPackages, selectedTemplates, allDeps, allDevDeps, i, pkg, selectedTemplate, _a, dependencies, devDependencies, commandsToRun;
+    var absoluteOutputDir, parentDir, templatesBuffer, rawTemplates, templates, allPackages, selectedPackages, selectedTemplates, allDeps, allDevDeps, i, pkg, selectedTemplate, _a, dependencies, devDependencies, commandsToRun, allUniqueDeps, allUniqueDevDeps, depsCommand, devDepsCommand;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -90,7 +90,7 @@ var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, functi
                 if (!(i < selectedPackages.length)) return [3 /*break*/, 6];
                 pkg = selectedPackages[i];
                 selectedTemplate = selectedTemplates[i];
-                return [4 /*yield*/, template_1.default(pkg, selectedTemplate, selectedPackages, absoluteOutputDir)];
+                return [4 /*yield*/, template_1.default(pkg, selectedTemplate, absoluteOutputDir, selectedPackages)];
             case 4:
                 _a = _b.sent(), dependencies = _a.dependencies, devDependencies = _a.devDependencies;
                 allDeps.push.apply(allDeps, dependencies);
@@ -101,8 +101,12 @@ var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, functi
                 return [3 /*break*/, 3];
             case 6:
                 commandsToRun = ["npm init"];
-                allDeps.length && commandsToRun.push("npm i " + allDeps.join(" "));
-                allDevDeps.length && commandsToRun.push("npm i -D " + allDevDeps.join(" "));
+                allUniqueDeps = Array.from(new Set(allDeps));
+                allUniqueDevDeps = Array.from(new Set(allDevDeps));
+                depsCommand = "npm i " + allUniqueDeps.join(" ");
+                devDepsCommand = "npm i -D " + allUniqueDevDeps.join(" ");
+                allUniqueDeps.length && commandsToRun.push(depsCommand);
+                allUniqueDevDeps.length && commandsToRun.push(devDepsCommand);
                 console.log({ commandsToRun: commandsToRun });
                 return [2 /*return*/];
         }

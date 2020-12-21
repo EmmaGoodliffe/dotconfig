@@ -46,91 +46,58 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var fs_1 = require("fs");
 var input_1 = require("input");
-var path_1 = require("path");
-var changes_1 = __importDefault(require("./changes"));
+var integration_1 = __importDefault(require("./integration"));
 var io_1 = require("./io");
-var readFile = fs_1.promises.readFile, writeFile = fs_1.promises.writeFile;
-var template = function (pkg, theTemplate, selectedPackages, outputDir) { return __awaiter(void 0, void 0, void 0, function () {
-    var deps, devDeps, _i, _a, integration, shouldUseIntegration, _b, _c, override, file, theChanges, path, beforeBuffer, beforeRaw, before, after, afterRaw, _d, _e, _f, extension, question, theExtension, options, shouldUseExtension, _g, dependencies, devDependencies;
-    return __generator(this, function (_h) {
-        switch (_h.label) {
+var template = function (pkg, theTemplate, outputDir, selectedPackages) { return __awaiter(void 0, void 0, void 0, function () {
+    var deps, devDeps, coms, _i, _a, theIntegration, shouldUseIntegration, _b, _c, _d, extension, question, theExtension, options, shouldUseExtension, _e, commands, dependencies, devDependencies;
+    return __generator(this, function (_f) {
+        switch (_f.label) {
             case 0:
                 deps = __spreadArrays((theTemplate.dependencies || []));
                 devDeps = __spreadArrays((theTemplate.devDependencies || []));
+                coms = __spreadArrays((theTemplate.commands || []));
                 return [4 /*yield*/, io_1.writeFiles(theTemplate.files, outputDir)];
             case 1:
-                _h.sent();
-                if (!theTemplate.integrations) return [3 /*break*/, 9];
-                _i = 0, _a = theTemplate.integrations;
-                _h.label = 2;
-            case 2:
-                if (!(_i < _a.length)) return [3 /*break*/, 9];
-                integration = _a[_i];
-                shouldUseIntegration = integration.integration.every(function (pkg) {
-                    return selectedPackages.includes(pkg);
-                });
-                if (!shouldUseIntegration) return [3 /*break*/, 8];
-                return [4 /*yield*/, io_1.writeFiles(integration.template.files, outputDir)];
-            case 3:
-                _h.sent();
-                if (!integration.overridesJSON) return [3 /*break*/, 8];
-                _b = 0, _c = integration.overridesJSON;
-                _h.label = 4;
-            case 4:
-                if (!(_b < _c.length)) return [3 /*break*/, 8];
-                override = _c[_b];
-                file = override.file;
-                theChanges = override.changes;
-                path = path_1.resolve(outputDir, file);
-                if (!fs_1.existsSync(file)) {
-                    throw pkg + "~" + integration.integration + " expected " + path + " to exist";
+                _f.sent();
+                if (theTemplate.integrations) {
+                    for (_i = 0, _a = theTemplate.integrations; _i < _a.length; _i++) {
+                        theIntegration = _a[_i];
+                        shouldUseIntegration = theIntegration.integration.every(function (pkg) {
+                            return selectedPackages.includes(pkg);
+                        });
+                        shouldUseIntegration &&
+                            integration_1.default(pkg, theIntegration, outputDir, selectedPackages);
+                    }
                 }
-                return [4 /*yield*/, readFile(path)];
-            case 5:
-                beforeBuffer = _h.sent();
-                beforeRaw = beforeBuffer.toString();
-                before = JSON.parse(beforeRaw);
-                after = changes_1.default(before, theChanges);
-                afterRaw = JSON.stringify(after);
-                return [4 /*yield*/, writeFile(path, afterRaw)];
-            case 6:
-                _h.sent();
-                _h.label = 7;
-            case 7:
-                _b++;
-                return [3 /*break*/, 4];
-            case 8:
-                _i++;
-                return [3 /*break*/, 2];
-            case 9:
-                if (!theTemplate.extensions) return [3 /*break*/, 14];
-                _d = [];
-                for (_e in theTemplate.extensions)
-                    _d.push(_e);
-                _f = 0;
-                _h.label = 10;
-            case 10:
-                if (!(_f < _d.length)) return [3 /*break*/, 14];
-                extension = _d[_f];
+                if (!theTemplate.extensions) return [3 /*break*/, 6];
+                _b = [];
+                for (_c in theTemplate.extensions)
+                    _b.push(_c);
+                _d = 0;
+                _f.label = 2;
+            case 2:
+                if (!(_d < _b.length)) return [3 /*break*/, 6];
+                extension = _b[_d];
                 question = "Do you want to set up " + pkg + " with " + extension;
                 theExtension = theTemplate.extensions[extension];
                 options = { default: theExtension.default };
                 return [4 /*yield*/, input_1.confirm(question, options)];
-            case 11:
-                shouldUseExtension = _h.sent();
-                if (!shouldUseExtension) return [3 /*break*/, 13];
-                return [4 /*yield*/, template(pkg + ":" + extension, theExtension.template, selectedPackages, outputDir)];
-            case 12:
-                _g = _h.sent(), dependencies = _g.dependencies, devDependencies = _g.devDependencies;
+            case 3:
+                shouldUseExtension = _f.sent();
+                if (!shouldUseExtension) return [3 /*break*/, 5];
+                return [4 /*yield*/, template(pkg + ":" + extension, theExtension.template, outputDir, selectedPackages)];
+            case 4:
+                _e = _f.sent(), commands = _e.commands, dependencies = _e.dependencies, devDependencies = _e.devDependencies;
+                coms.push.apply(coms, commands);
                 deps.push.apply(deps, dependencies);
                 devDeps.push.apply(devDeps, devDependencies);
-                _h.label = 13;
-            case 13:
-                _f++;
-                return [3 /*break*/, 10];
-            case 14: return [2 /*return*/, {
+                _f.label = 5;
+            case 5:
+                _d++;
+                return [3 /*break*/, 2];
+            case 6: return [2 /*return*/, {
+                    commands: coms,
                     dependencies: deps,
                     devDependencies: devDeps,
                 }];
