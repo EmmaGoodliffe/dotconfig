@@ -2,6 +2,7 @@ interface ArrayAddModifier {
   add: string;
 }
 
+// TODO: change how set modifier works
 interface ObjectSetModifier {
   set: { [key: string]: string };
 }
@@ -25,7 +26,7 @@ export interface File_ {
   url?: string;
 }
 
-interface Integration {
+export interface Integration {
   integration: string[];
   template: Template;
   overridesJSON?: { file: string; changes: Change[] }[];
@@ -38,7 +39,10 @@ export interface Template {
   devDependencies?: string[];
   commands?: string[];
   extensions?: {
-    [name: string]: Template;
+    [extension: string]: {
+      default: boolean;
+      template: Template;
+    };
   };
 }
 

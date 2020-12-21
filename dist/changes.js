@@ -31,6 +31,9 @@ var changes = function (input, changes) {
         }
         else if (change.type === "Object") {
             if (change.modifier.set !== undefined) {
+                if (change.key.includes(".")) {
+                    throw "Compound keys are not supported yet. Received: " + change.key;
+                }
                 var previousValues = result[change.key];
                 result[change.key] = __assign(__assign({}, previousValues), change.modifier.set);
             }

@@ -3,12 +3,7 @@ import { readFileSync } from "fs";
 
 const ajv = new Ajv();
 
-const removeDotPrefix = (x: string) => {
-  if (x.slice(0, 1) === ".") {
-    x = x.slice(1);
-  }
-  return x;
-};
+const removeDotPrefix = (x: string) => (x.slice(0, 1) === "." ? x.slice(1) : x);
 
 const parseDataPath = (dataPath: string) => {
   const elements = dataPath

@@ -6,12 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ajv_1 = __importDefault(require("ajv"));
 var fs_1 = require("fs");
 var ajv = new ajv_1.default();
-var removeDotPrefix = function (x) {
-    if (x.slice(0, 1) === ".") {
-        x = x.slice(1);
-    }
-    return x;
-};
+var removeDotPrefix = function (x) { return (x.slice(0, 1) === "." ? x.slice(1) : x); };
 var parseDataPath = function (dataPath) {
     var elements = dataPath
         .split("/")

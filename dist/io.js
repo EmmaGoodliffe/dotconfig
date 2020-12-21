@@ -89,7 +89,7 @@ var getFile = function (url) { return __awaiter(void 0, void 0, void 0, function
 var writeFiles = function (files, outputDir) {
     if (files === void 0) { files = []; }
     var promises = files.map(function (file) { return __awaiter(void 0, void 0, void 0, function () {
-        var url, raw, path, dir, shouldWrite, _a, _b;
+        var url, raw, path, dir, question, options, shouldWrite, _a, _b;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
@@ -100,11 +100,11 @@ var writeFiles = function (files, outputDir) {
                     path = path_1.resolve(outputDir, file.file);
                     dir = path_1.dirname(path);
                     recursivelyCreateDir(dir);
+                    question = path + " already exists. Do you want to override it?";
+                    options = { default: false };
                     _a = !fs_1.existsSync(path);
                     if (_a) return [3 /*break*/, 3];
-                    return [4 /*yield*/, input_1.confirm(path + " already exists. Do you want to override it?", {
-                            default: false,
-                        })];
+                    return [4 /*yield*/, input_1.confirm(question, options)];
                 case 2:
                     _a = (_c.sent());
                     _c.label = 3;

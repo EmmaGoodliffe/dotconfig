@@ -1,10 +1,7 @@
-import { existsSync, promises } from "fs";
-import { resolve } from "path";
-import changes from "./changes";
+import { confirm } from "input";
+import integration from "./integration";
 import { writeFiles } from "./io";
 import { Template } from "./types";
-
-const { readFile, writeFile } = promises;
 
 const template = async (
   pkg: string,
@@ -12,6 +9,7 @@ const template = async (
   selectedPackages: string[],
   outputDir: string,
 ): Promise<{
+  commands: string[];
   dependencies: string[];
   devDependencies: string[];
 }> => {
@@ -19,43 +17,23 @@ const template = async (
   const devDeps = [...(theTemplate.devDependencies || [])];
   await writeFiles(theTemplate.files, outputDir);
   if (theTemplate.integrations) {
-    for (const integration of theTemplate.integrations) {
-      const useIntegration = integration.integration.every(pkg =>
+    for (const theIntegration of theTemplate.integrations) {
+      const shouldUseIntegration = theIntegration.integration.every(pkg =>
         selectedPackages.includes(pkg),
       );
-      if (useIntegration) {
-        await writeFiles(integration.template.files, outputDir);
-        // TODO: Complete other parts of template
-        if (integration.overridesJSON) {
-          for (const override of integration.overridesJSON) {
-            const { file } = override;
-            const theChanges = override.changes;
-            const path = resolve(outputDir, file);
-            if (!existsSync(file)) {
-              throw `${pkg}~${integration.integration} expected ${path} to exist`;
-            }
-            const beforeBuffer = await readFile(path);
-            const beforeRaw = beforeBuffer.toString();
-            const before = JSON.parse(beforeRaw);
-            const after = changes(before, theChanges);
-            const afterRaw = JSON.stringify(after);
-            await writeFile(path, afterRaw);
-          }
-        }
-      }
+      shouldUseIntegration && integration(pkg, theIntegration, outputDir);
     }
   }
   if (theTemplate.extensions) {
     for (const extension in theTemplate.extensions) {
       const question = `Do you want to set up ${pkg} with ${extension}`;
-      console.log({ question });
-      // TODO: ask question
-      const answer = false;
-      if (answer) {
-        const extTemplate = theTemplate.extensions[extension];
+      const theExtension = theTemplate.extensions[extension];
+      const options = { default: theExtension.default };
+      const shouldUseExtension = await confirm(question, options);
+      if (shouldUseExtension) {
         const { dependencies, devDependencies } = await template(
           `${pkg}:${extension}`,
-          extTemplate,
+          theExtension.template,
           selectedPackages,
           outputDir,
         );
@@ -65,6 +43,7 @@ const template = async (
     }
   }
   return {
+    commands: theTemplate.commands || [],
     dependencies: deps,
     devDependencies: devDeps,
   };

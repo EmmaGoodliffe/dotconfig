@@ -90,11 +90,9 @@ var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, functi
                 if (!(i < selectedPackages.length)) return [3 /*break*/, 6];
                 pkg = selectedPackages[i];
                 selectedTemplate = selectedTemplates[i];
-                console.time("" + i);
                 return [4 /*yield*/, template_1.default(pkg, selectedTemplate, selectedPackages, absoluteOutputDir)];
             case 4:
                 _a = _b.sent(), dependencies = _a.dependencies, devDependencies = _a.devDependencies;
-                console.timeEnd("" + i);
                 allDeps.push.apply(allDeps, dependencies);
                 allDevDeps.push.apply(allDevDeps, devDependencies);
                 _b.label = 5;

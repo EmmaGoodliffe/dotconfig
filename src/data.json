@@ -51,7 +51,10 @@
       { "file": ".github/PULL_REQUEST_TEMPLATE.md" }
     ],
     "extensions": {
-      "workflows": { "files": [{ "file": ".github/workflows/ci.yml" }] }
+      "workflows": {
+        "template": { "files": [{ "file": ".github/workflows/ci.yml" }] },
+        "default": false
+      }
     }
   },
   "typescript": {

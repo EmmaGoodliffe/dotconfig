@@ -49,11 +49,9 @@ export const writeFiles = (
     const path = resolve(outputDir, file.file);
     const dir = dirname(path);
     recursivelyCreateDir(dir);
-    const shouldWrite =
-      !existsSync(path) ||
-      (await confirm(`${path} already exists. Do you want to override it?`, {
-        default: false,
-      }));
+    const question = `${path} already exists. Do you want to override it?`;
+    const options = { default: false };
+    const shouldWrite = !existsSync(path) || (await confirm(question, options));
     shouldWrite && (await writeFile(path, raw));
   });
   return Promise.all(promises);
