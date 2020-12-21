@@ -32,12 +32,15 @@ export interface Integration {
   overridesJSON?: { file: string; changes: Change[] }[];
 }
 
-export interface Template {
+export interface TemplateResult {
+  commands: string[];
+  dependencies: string[];
+  devDependencies: string[];
+}
+
+export interface Template extends TemplateResult {
   files?: File_[];
   integrations?: Integration[];
-  dependencies?: string[];
-  devDependencies?: string[];
-  commands?: string[];
   extensions?: {
     [extension: string]: {
       default: boolean;

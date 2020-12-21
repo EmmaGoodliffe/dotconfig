@@ -46,8 +46,8 @@ const run = async (outputDir: string | number) => {
     const { dependencies, devDependencies } = await template(
       pkg,
       selectedTemplate,
-      selectedPackages,
       absoluteOutputDir,
+      selectedPackages,
     );
     allDeps.push(...dependencies);
     allDevDeps.push(...devDependencies);

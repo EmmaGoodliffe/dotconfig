@@ -1,27 +1,25 @@
 import { confirm } from "input";
 import integration from "./integration";
 import { writeFiles } from "./io";
-import { Template } from "./types";
+import { Template, TemplateResult } from "./types";
 
 const template = async (
   pkg: string,
   theTemplate: Template,
-  selectedPackages: string[],
   outputDir: string,
-): Promise<{
-  commands: string[];
-  dependencies: string[];
-  devDependencies: string[];
-}> => {
+  selectedPackages: string[],
+): Promise<TemplateResult> => {
   const deps = [...(theTemplate.dependencies || [])];
   const devDeps = [...(theTemplate.devDependencies || [])];
+  const coms = [...(theTemplate.commands || [])];
   await writeFiles(theTemplate.files, outputDir);
   if (theTemplate.integrations) {
     for (const theIntegration of theTemplate.integrations) {
       const shouldUseIntegration = theIntegration.integration.every(pkg =>
         selectedPackages.includes(pkg),
       );
-      shouldUseIntegration && integration(pkg, theIntegration, outputDir);
+      shouldUseIntegration &&
+        integration(pkg, theIntegration, outputDir, selectedPackages);
     }
   }
   if (theTemplate.extensions) {
@@ -31,19 +29,20 @@ const template = async (
       const options = { default: theExtension.default };
       const shouldUseExtension = await confirm(question, options);
       if (shouldUseExtension) {
-        const { dependencies, devDependencies } = await template(
+        const { commands, dependencies, devDependencies } = await template(
           `${pkg}:${extension}`,
           theExtension.template,
-          selectedPackages,
           outputDir,
+          selectedPackages,
         );
+        coms.push(...commands);
         deps.push(...dependencies);
         devDeps.push(...devDependencies);
       }
     }
   }
   return {
-    commands: theTemplate.commands || [],
+    commands: coms,
     dependencies: deps,
     devDependencies: devDeps,
   };
