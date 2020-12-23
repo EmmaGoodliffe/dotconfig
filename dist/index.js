@@ -43,13 +43,14 @@ var fs_1 = require("fs");
 var input_1 = require("input");
 var path_1 = require("path");
 var yargs_1 = require("yargs");
+var commands_1 = __importDefault(require("./commands"));
 var schema_1 = __importDefault(require("./schema"));
 var template_1 = __importDefault(require("./template"));
 var readFile = fs_1.promises.readFile;
 var templatesPath = path_1.resolve(__dirname, "./data.json");
 var schemaPath = path_1.resolve(__dirname, "../dist/schema.json");
 var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, function () {
-    var absoluteOutputDir, parentDir, templatesBuffer, rawTemplates, templates, allPackages, selectedPackages, selectedTemplates, allDeps, allDevDeps, i, pkg, selectedTemplate, _a, dependencies, devDependencies, commandsToRun, allUniqueDeps, allUniqueDevDeps, depsCommand, devDepsCommand;
+    var absoluteOutputDir, parentDir, templatesBuffer, rawTemplates, templates, allPackages, selectedPackages, selectedTemplates, allDeps, allDevDeps, i, pkg, selectedTemplate, _a, dependencies, devDependencies, commandsToRun, allUniqueDeps, allUniqueDevDeps, depsCommand, devDepsCommand, fullDepsCommand, fullDevDepsCommand;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -100,14 +101,18 @@ var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, functi
                 i++;
                 return [3 /*break*/, 3];
             case 6:
-                commandsToRun = ["npm init"];
+                commandsToRun = [
+                    { command: "npm init", affectedFiles: ["package.json"] },
+                ];
                 allUniqueDeps = Array.from(new Set(allDeps));
                 allUniqueDevDeps = Array.from(new Set(allDevDeps));
                 depsCommand = "npm i " + allUniqueDeps.join(" ");
                 devDepsCommand = "npm i -D " + allUniqueDevDeps.join(" ");
-                allUniqueDeps.length && commandsToRun.push(depsCommand);
-                allUniqueDevDeps.length && commandsToRun.push(devDepsCommand);
-                console.log({ commandsToRun: commandsToRun });
+                fullDepsCommand = { command: depsCommand, affectedFiles: [] };
+                fullDevDepsCommand = { command: devDepsCommand, affectedFiles: [] };
+                allUniqueDeps.length && commandsToRun.push(fullDepsCommand);
+                allUniqueDevDeps.length && commandsToRun.push(fullDevDepsCommand);
+                commands_1.default(commandsToRun, outputDir);
                 return [2 /*return*/];
         }
     });

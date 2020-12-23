@@ -21,6 +21,18 @@ interface ObjectChange {
 
 export type Change = ArrayChange | ObjectChange;
 
+export interface Command {
+  command: string;
+  affectedFiles: string[];
+  destructive: boolean;
+}
+
+export interface TemplateResult {
+  commands: Command[];
+  dependencies: string[];
+  devDependencies: string[];
+}
+
 export interface File_ {
   file: string;
   url?: string;
@@ -30,12 +42,6 @@ export interface Integration {
   integration: string[];
   template: Template;
   overridesJSON?: { file: string; changes: Change[] }[];
-}
-
-export interface TemplateResult {
-  commands: string[];
-  dependencies: string[];
-  devDependencies: string[];
 }
 
 export interface Template extends TemplateResult {

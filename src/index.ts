@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, promises } from "fs";
 import { checkboxes } from "input";
 import { dirname, resolve } from "path";
 import { argv } from "yargs";
+import commands from "./commands";
 import schema from "./schema";
 import template from "./template";
 import { Templates } from "./types";
@@ -52,14 +53,18 @@ const run = async (outputDir: string | number) => {
     allDeps.push(...dependencies);
     allDevDeps.push(...devDependencies);
   }
-  const commandsToRun = ["npm init"];
+  const commandsToRun = [
+    { command: "npm init", affectedFiles: ["package.json"] },
+  ];
   const allUniqueDeps = Array.from(new Set(allDeps));
   const allUniqueDevDeps = Array.from(new Set(allDevDeps));
   const depsCommand = `npm i ${allUniqueDeps.join(" ")}`;
   const devDepsCommand = `npm i -D ${allUniqueDevDeps.join(" ")}`;
-  allUniqueDeps.length && commandsToRun.push(depsCommand);
-  allUniqueDevDeps.length && commandsToRun.push(devDepsCommand);
-  console.log({ commandsToRun });
+  const fullDepsCommand = { command: depsCommand, affectedFiles: [] };
+  const fullDevDepsCommand = { command: devDepsCommand, affectedFiles: [] };
+  allUniqueDeps.length && commandsToRun.push(fullDepsCommand);
+  allUniqueDevDeps.length && commandsToRun.push(fullDevDepsCommand);
+  commands(commandsToRun, outputDir);
 };
 
 run(argv._[0]).catch(console.error);

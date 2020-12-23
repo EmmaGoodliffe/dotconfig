@@ -79,7 +79,13 @@
     }
   },
   "typescript": {
-    "commands": ["npx tsc --init"],
+    "commands": [
+      {
+        "command": "npx tsc --init",
+        "affectedFiles": ["tsconfig.json"],
+        "destructive": true
+      }
+    ],
     "dependencies": [],
     "devDependencies": ["typescript"]
   }
