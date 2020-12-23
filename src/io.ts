@@ -40,19 +40,22 @@ const getFile = async (url: string) => {
 };
 
 export const writeFiles = (
-  files: File_[] = [],
+  files: File_[],
   outputDir: string,
-): Promise<void[]> => {
+): Promise<string[][]> => {
   const promises = files.map(async file => {
-    const url = file.url || defaultUrl + file.file;
-    const raw = await getFile(url);
+    const fullDefaultUrl = file.commands ? null : defaultUrl + file.file;
+    const url = file.url || fullDefaultUrl;
+    const raw = url && (await getFile(url));
     const path = resolve(outputDir, file.file);
     const dir = dirname(path);
     recursivelyCreateDir(dir);
     const question = `${path} already exists. Do you want to override it?`;
-    const options = { default: false };
+    const options = { default: file.override };
     const shouldWrite = !existsSync(path) || (await confirm(question, options));
-    shouldWrite && (await writeFile(path, raw));
+    shouldWrite && raw && (await writeFile(path, raw));
+    const result = shouldWrite && file.commands;
+    return result || [];
   });
   return Promise.all(promises);
 };

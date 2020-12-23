@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, promises } from "fs";
 import { checkboxes } from "input";
 import { dirname, resolve } from "path";
 import { argv } from "yargs";
-import commands from "./commands";
+import { writeFiles } from "./io";
 import schema from "./schema";
 import template from "./template";
 import { Templates } from "./types";
@@ -53,18 +53,18 @@ const run = async (outputDir: string | number) => {
     allDeps.push(...dependencies);
     allDevDeps.push(...devDependencies);
   }
-  const commandsToRun = [
-    { command: "npm init", affectedFiles: ["package.json"] },
-  ];
+  await writeFiles(
+    [{ file: "package.json", commands: ["npm init"], override: true }],
+    outputDir,
+  );
   const allUniqueDeps = Array.from(new Set(allDeps));
   const allUniqueDevDeps = Array.from(new Set(allDevDeps));
   const depsCommand = `npm i ${allUniqueDeps.join(" ")}`;
   const devDepsCommand = `npm i -D ${allUniqueDevDeps.join(" ")}`;
-  const fullDepsCommand = { command: depsCommand, affectedFiles: [] };
-  const fullDevDepsCommand = { command: devDepsCommand, affectedFiles: [] };
-  allUniqueDeps.length && commandsToRun.push(fullDepsCommand);
-  allUniqueDevDeps.length && commandsToRun.push(fullDevDepsCommand);
-  commands(commandsToRun, outputDir);
+  const allCommands = [];
+  allUniqueDeps.length && allCommands.push(depsCommand);
+  allUniqueDevDeps.length && allCommands.push(devDepsCommand);
+  console.log({ allCommands });
 };
 
 run(argv._[0]).catch(console.error);

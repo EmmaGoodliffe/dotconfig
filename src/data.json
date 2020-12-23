@@ -1,14 +1,21 @@
 {
   "eslint": {
-    "commands": [],
     "dependencies": [],
     "devDependencies": ["eslint", "eslint-plugin-import"],
     "files": [
-      { "file": ".eslintrc.json", "url": "../content/eslint/.eslintrc.json" }
+      {
+        "file": ".eslintrc.json",
+        "url": "../content/eslint/.eslintrc.json",
+        "override": true
+      }
     ],
     "integrations": [
       {
         "integration": ["prettier"],
+        "template": {
+          "dependencies": [],
+          "devDependencies": ["eslint-plugin-prettier"]
+        },
         "overridesJSON": [
           {
             "file": ".eslintrc.json",
@@ -25,17 +32,11 @@
               }
             ]
           }
-        ],
-        "template": {
-          "commands": [],
-          "dependencies": [],
-          "devDependencies": ["eslint-plugin-prettier"]
-        }
+        ]
       },
       {
         "integration": ["typescript"],
         "template": {
-          "commands": [],
           "dependencies": [],
           "devDependencies": [
             "@typescript-eslint/eslint-plugin",
@@ -46,47 +47,46 @@
     ]
   },
   "prettier": {
-    "commands": [],
     "dependencies": [],
     "devDependencies": ["prettier"],
-    "files": [{ "file": ".prettierrc" }]
+    "files": [{ "file": ".prettierrc", "override": false }]
   },
   "git": {
-    "commands": [],
     "dependencies": [],
     "devDependencies": ["prettier"],
-    "files": [{ "file": ".gitignore" }]
+    "files": [{ "file": ".gitignore", "override": false }]
   },
   "github": {
-    "commands": [],
     "dependencies": [],
     "devDependencies": ["prettier"],
     "files": [
-      { "file": ".github/ISSUE_TEMPLATE/bug_report.md" },
-      { "file": ".github/ISSUE_TEMPLATE/feature_request.md" },
-      { "file": ".github/PULL_REQUEST_TEMPLATE.md" }
+      { "file": ".github/ISSUE_TEMPLATE/bug_report.md", "override": false },
+      {
+        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
+        "override": false
+      },
+      { "file": ".github/PULL_REQUEST_TEMPLATE.md", "override": false }
     ],
     "extensions": {
       "workflows": {
+        "default": false,
         "template": {
-          "commands": [],
           "dependencies": [],
           "devDependencies": ["prettier"],
-          "files": [{ "file": ".github/workflows/ci.yml" }]
-        },
-        "default": false
+          "files": [{ "file": ".github/workflows/ci.yml", "override": true }]
+        }
       }
     }
   },
   "typescript": {
-    "commands": [
-      {
-        "command": "npx tsc --init",
-        "affectedFiles": ["tsconfig.json"],
-        "destructive": true
-      }
-    ],
     "dependencies": [],
-    "devDependencies": ["typescript"]
+    "devDependencies": ["typescript"],
+    "files": [
+      {
+        "file": "tsconfig.json",
+        "commands": ["npx tsc --init"],
+        "override": false
+      }
+    ]
   }
 }

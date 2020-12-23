@@ -50,54 +50,61 @@ var input_1 = require("input");
 var integration_1 = __importDefault(require("./integration"));
 var io_1 = require("./io");
 var template = function (pkg, theTemplate, outputDir, selectedPackages) { return __awaiter(void 0, void 0, void 0, function () {
-    var deps, devDeps, coms, _i, _a, theIntegration, shouldUseIntegration, _b, _c, _d, extension, question, theExtension, options, shouldUseExtension, _e, commands, dependencies, devDependencies;
-    return __generator(this, function (_f) {
-        switch (_f.label) {
+    var deps, devDeps, _i, _a, theIntegration, shouldUseIntegration, _b, dependencies, devDependencies, _c, _d, _e, extension, question, theExtension, options, shouldUseExtension, _f, dependencies, devDependencies;
+    return __generator(this, function (_g) {
+        switch (_g.label) {
             case 0:
                 deps = __spreadArrays((theTemplate.dependencies || []));
                 devDeps = __spreadArrays((theTemplate.devDependencies || []));
-                coms = __spreadArrays((theTemplate.commands || []));
-                return [4 /*yield*/, io_1.writeFiles(theTemplate.files, outputDir)];
+                return [4 /*yield*/, io_1.writeFiles(theTemplate.files || [], outputDir)];
             case 1:
-                _f.sent();
-                if (theTemplate.integrations) {
-                    for (_i = 0, _a = theTemplate.integrations; _i < _a.length; _i++) {
-                        theIntegration = _a[_i];
-                        shouldUseIntegration = theIntegration.integration.every(function (pkg) {
-                            return selectedPackages.includes(pkg);
-                        });
-                        shouldUseIntegration &&
-                            integration_1.default(pkg, theIntegration, outputDir, selectedPackages);
-                    }
-                }
-                if (!theTemplate.extensions) return [3 /*break*/, 6];
-                _b = [];
-                for (_c in theTemplate.extensions)
-                    _b.push(_c);
-                _d = 0;
-                _f.label = 2;
+                _g.sent();
+                if (!theTemplate.integrations) return [3 /*break*/, 5];
+                _i = 0, _a = theTemplate.integrations;
+                _g.label = 2;
             case 2:
-                if (!(_d < _b.length)) return [3 /*break*/, 6];
-                extension = _b[_d];
+                if (!(_i < _a.length)) return [3 /*break*/, 5];
+                theIntegration = _a[_i];
+                shouldUseIntegration = theIntegration.integration.every(function (pkg) {
+                    return selectedPackages.includes(pkg);
+                });
+                if (!shouldUseIntegration) return [3 /*break*/, 4];
+                return [4 /*yield*/, integration_1.default(pkg, theIntegration, outputDir, selectedPackages)];
+            case 3:
+                _b = _g.sent(), dependencies = _b.dependencies, devDependencies = _b.devDependencies;
+                deps.push.apply(deps, dependencies);
+                devDeps.push.apply(devDeps, devDependencies);
+                _g.label = 4;
+            case 4:
+                _i++;
+                return [3 /*break*/, 2];
+            case 5:
+                if (!theTemplate.extensions) return [3 /*break*/, 10];
+                _c = [];
+                for (_d in theTemplate.extensions)
+                    _c.push(_d);
+                _e = 0;
+                _g.label = 6;
+            case 6:
+                if (!(_e < _c.length)) return [3 /*break*/, 10];
+                extension = _c[_e];
                 question = "Do you want to set up " + pkg + " with " + extension;
                 theExtension = theTemplate.extensions[extension];
                 options = { default: theExtension.default };
                 return [4 /*yield*/, input_1.confirm(question, options)];
-            case 3:
-                shouldUseExtension = _f.sent();
-                if (!shouldUseExtension) return [3 /*break*/, 5];
+            case 7:
+                shouldUseExtension = _g.sent();
+                if (!shouldUseExtension) return [3 /*break*/, 9];
                 return [4 /*yield*/, template(pkg + ":" + extension, theExtension.template, outputDir, selectedPackages)];
-            case 4:
-                _e = _f.sent(), commands = _e.commands, dependencies = _e.dependencies, devDependencies = _e.devDependencies;
-                coms.push.apply(coms, commands);
+            case 8:
+                _f = _g.sent(), dependencies = _f.dependencies, devDependencies = _f.devDependencies;
                 deps.push.apply(deps, dependencies);
                 devDeps.push.apply(devDeps, devDependencies);
-                _f.label = 5;
-            case 5:
-                _d++;
-                return [3 /*break*/, 2];
-            case 6: return [2 /*return*/, {
-                    commands: coms,
+                _g.label = 9;
+            case 9:
+                _e++;
+                return [3 /*break*/, 6];
+            case 10: return [2 /*return*/, {
                     dependencies: deps,
                     devDependencies: devDeps,
                 }];

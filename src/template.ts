@@ -11,15 +11,22 @@ const template = async (
 ): Promise<TemplateResult> => {
   const deps = [...(theTemplate.dependencies || [])];
   const devDeps = [...(theTemplate.devDependencies || [])];
-  const coms = [...(theTemplate.commands || [])];
-  await writeFiles(theTemplate.files, outputDir);
+  await writeFiles(theTemplate.files || [], outputDir);
   if (theTemplate.integrations) {
     for (const theIntegration of theTemplate.integrations) {
       const shouldUseIntegration = theIntegration.integration.every(pkg =>
         selectedPackages.includes(pkg),
       );
-      shouldUseIntegration &&
-        integration(pkg, theIntegration, outputDir, selectedPackages);
+      if (shouldUseIntegration) {
+        const { dependencies, devDependencies } = await integration(
+          pkg,
+          theIntegration,
+          outputDir,
+          selectedPackages,
+        );
+        deps.push(...dependencies);
+        devDeps.push(...devDependencies);
+      }
     }
   }
   if (theTemplate.extensions) {
@@ -29,20 +36,18 @@ const template = async (
       const options = { default: theExtension.default };
       const shouldUseExtension = await confirm(question, options);
       if (shouldUseExtension) {
-        const { commands, dependencies, devDependencies } = await template(
+        const { dependencies, devDependencies } = await template(
           `${pkg}:${extension}`,
           theExtension.template,
           outputDir,
           selectedPackages,
         );
-        coms.push(...commands);
         deps.push(...dependencies);
         devDeps.push(...devDependencies);
       }
     }
   }
   return {
-    commands: coms,
     dependencies: deps,
     devDependencies: devDeps,
   };

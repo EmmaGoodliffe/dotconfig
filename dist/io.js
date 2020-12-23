@@ -87,38 +87,44 @@ var getFile = function (url) { return __awaiter(void 0, void 0, void 0, function
     });
 }); };
 var writeFiles = function (files, outputDir) {
-    if (files === void 0) { files = []; }
     var promises = files.map(function (file) { return __awaiter(void 0, void 0, void 0, function () {
-        var url, raw, path, dir, question, options, shouldWrite, _a, _b;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var fullDefaultUrl, url, raw, _a, path, dir, question, options, shouldWrite, _b, _c, result;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0:
-                    url = file.url || defaultUrl + file.file;
+                    fullDefaultUrl = file.commands ? null : defaultUrl + file.file;
+                    url = file.url || fullDefaultUrl;
+                    _a = url;
+                    if (!_a) return [3 /*break*/, 2];
                     return [4 /*yield*/, getFile(url)];
                 case 1:
-                    raw = _c.sent();
+                    _a = (_d.sent());
+                    _d.label = 2;
+                case 2:
+                    raw = _a;
                     path = path_1.resolve(outputDir, file.file);
                     dir = path_1.dirname(path);
                     recursivelyCreateDir(dir);
                     question = path + " already exists. Do you want to override it?";
-                    options = { default: false };
-                    _a = !fs_1.existsSync(path);
-                    if (_a) return [3 /*break*/, 3];
+                    options = { default: file.override };
+                    _b = !fs_1.existsSync(path);
+                    if (_b) return [3 /*break*/, 4];
                     return [4 /*yield*/, input_1.confirm(question, options)];
-                case 2:
-                    _a = (_c.sent());
-                    _c.label = 3;
                 case 3:
-                    shouldWrite = _a;
-                    _b = shouldWrite;
-                    if (!_b) return [3 /*break*/, 5];
-                    return [4 /*yield*/, writeFile(path, raw)];
+                    _b = (_d.sent());
+                    _d.label = 4;
                 case 4:
-                    _b = (_c.sent());
-                    _c.label = 5;
+                    shouldWrite = _b;
+                    _c = shouldWrite && raw;
+                    if (!_c) return [3 /*break*/, 6];
+                    return [4 /*yield*/, writeFile(path, raw)];
                 case 5:
-                    _b;
-                    return [2 /*return*/];
+                    _c = (_d.sent());
+                    _d.label = 6;
+                case 6:
+                    _c;
+                    result = shouldWrite && file.commands;
+                    return [2 /*return*/, result || []];
             }
         });
     }); });
