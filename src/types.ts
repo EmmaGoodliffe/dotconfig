@@ -21,9 +21,13 @@ interface ObjectChange {
 
 export type Change = ArrayChange | ObjectChange;
 
-export interface TemplateResult {
+interface Dependencies {
   dependencies: string[];
   devDependencies: string[];
+}
+
+export interface TemplateResult extends Dependencies {
+  commands: string[];
 }
 
 export interface File_ {
@@ -36,10 +40,11 @@ export interface File_ {
 export interface Integration {
   integration: string[];
   template: Template;
+  // TODO: Rename to jsonOverrides
   overridesJSON?: { file: string; changes: Change[] }[];
 }
 
-export interface Template extends TemplateResult {
+export interface Template extends Dependencies {
   files?: File_[];
   integrations?: Integration[];
   extensions?: {

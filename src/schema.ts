@@ -18,6 +18,7 @@ const parseDataPath = (dataPath: string) => {
 };
 
 const schema = (data: Record<string, unknown>, schemaPath: string): void => {
+  // TODO: Use import statement
   const theSchema = JSON.parse(readFileSync(schemaPath).toString());
   const validate = ajv.compile(theSchema);
   const result = validate(data);

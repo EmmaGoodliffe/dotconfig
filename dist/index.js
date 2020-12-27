@@ -35,6 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -50,7 +57,7 @@ var readFile = fs_1.promises.readFile;
 var templatesPath = path_1.resolve(__dirname, "./data.json");
 var schemaPath = path_1.resolve(__dirname, "../dist/schema.json");
 var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, function () {
-    var absoluteOutputDir, parentDir, templatesBuffer, rawTemplates, templates, allPackages, selectedPackages, selectedTemplates, allDeps, allDevDeps, i, pkg, selectedTemplate, _a, dependencies, devDependencies, allUniqueDeps, allUniqueDevDeps, depsCommand, devDepsCommand, allCommands;
+    var absoluteOutputDir, parentDir, templatesBuffer, rawTemplates, templates, allPackages, selectedPackages, selectedTemplates, allDeps, allDevDeps, fileCommands, i, pkg, selectedTemplate, _a, dependencies, devDependencies, commands, npmCommand, npmCommands, allUniqueDeps, allUniqueDevDeps, depsCommand, devDepsCommand, allCommands;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -85,6 +92,7 @@ var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, functi
                 selectedTemplates = selectedPackages.map(function (pkg) { return templates[pkg]; });
                 allDeps = [];
                 allDevDeps = [];
+                fileCommands = [];
                 i = 0;
                 _b.label = 3;
             case 3:
@@ -93,23 +101,25 @@ var run = function (outputDir) { return __awaiter(void 0, void 0, void 0, functi
                 selectedTemplate = selectedTemplates[i];
                 return [4 /*yield*/, template_1.default(pkg, selectedTemplate, absoluteOutputDir, selectedPackages)];
             case 4:
-                _a = _b.sent(), dependencies = _a.dependencies, devDependencies = _a.devDependencies;
+                _a = _b.sent(), dependencies = _a.dependencies, devDependencies = _a.devDependencies, commands = _a.commands;
                 allDeps.push.apply(allDeps, dependencies);
                 allDevDeps.push.apply(allDevDeps, devDependencies);
+                fileCommands.push.apply(fileCommands, commands);
                 _b.label = 5;
             case 5:
                 i++;
                 return [3 /*break*/, 3];
             case 6: return [4 /*yield*/, io_1.writeFiles([{ file: "package.json", commands: ["npm init"], override: true }], outputDir)];
             case 7:
-                _b.sent();
+                npmCommand = _b.sent();
+                npmCommands = __spreadArrays(npmCommand).flat();
                 allUniqueDeps = Array.from(new Set(allDeps));
                 allUniqueDevDeps = Array.from(new Set(allDevDeps));
                 depsCommand = "npm i " + allUniqueDeps.join(" ");
                 devDepsCommand = "npm i -D " + allUniqueDevDeps.join(" ");
-                allCommands = [];
-                allUniqueDeps.length && allCommands.push(depsCommand);
-                allUniqueDevDeps.length && allCommands.push(devDepsCommand);
+                allUniqueDeps.length && npmCommands.push(depsCommand);
+                allUniqueDevDeps.length && npmCommands.push(devDepsCommand);
+                allCommands = __spreadArrays(npmCommands, fileCommands);
                 console.log({ allCommands: allCommands });
                 return [2 /*return*/];
         }

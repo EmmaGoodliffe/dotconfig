@@ -19,6 +19,7 @@ var parseDataPath = function (dataPath) {
     return result;
 };
 var schema = function (data, schemaPath) {
+    // TODO: Use import statement
     var theSchema = JSON.parse(fs_1.readFileSync(schemaPath).toString());
     var validate = ajv.compile(theSchema);
     var result = validate(data);

@@ -50,7 +50,7 @@ var input_1 = require("input");
 var integration_1 = __importDefault(require("./integration"));
 var io_1 = require("./io");
 var template = function (pkg, theTemplate, outputDir, selectedPackages) { return __awaiter(void 0, void 0, void 0, function () {
-    var deps, devDeps, _i, _a, theIntegration, shouldUseIntegration, _b, dependencies, devDependencies, _c, _d, _e, extension, question, theExtension, options, shouldUseExtension, _f, dependencies, devDependencies;
+    var deps, devDeps, commands, _i, _a, theIntegration, shouldUseIntegration, _b, dependencies, devDependencies, _c, _d, _e, extension, question, theExtension, options, shouldUseExtension, _f, dependencies, devDependencies;
     return __generator(this, function (_g) {
         switch (_g.label) {
             case 0:
@@ -58,7 +58,7 @@ var template = function (pkg, theTemplate, outputDir, selectedPackages) { return
                 devDeps = __spreadArrays((theTemplate.devDependencies || []));
                 return [4 /*yield*/, io_1.writeFiles(theTemplate.files || [], outputDir)];
             case 1:
-                _g.sent();
+                commands = _g.sent();
                 if (!theTemplate.integrations) return [3 /*break*/, 5];
                 _i = 0, _a = theTemplate.integrations;
                 _g.label = 2;
@@ -107,6 +107,7 @@ var template = function (pkg, theTemplate, outputDir, selectedPackages) { return
             case 10: return [2 /*return*/, {
                     dependencies: deps,
                     devDependencies: devDeps,
+                    commands: commands.flat(),
                 }];
         }
     });

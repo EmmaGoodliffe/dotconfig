@@ -11,7 +11,7 @@ const template = async (
 ): Promise<TemplateResult> => {
   const deps = [...(theTemplate.dependencies || [])];
   const devDeps = [...(theTemplate.devDependencies || [])];
-  await writeFiles(theTemplate.files || [], outputDir);
+  const commands = await writeFiles(theTemplate.files || [], outputDir);
   if (theTemplate.integrations) {
     for (const theIntegration of theTemplate.integrations) {
       const shouldUseIntegration = theIntegration.integration.every(pkg =>
@@ -50,6 +50,7 @@ const template = async (
   return {
     dependencies: deps,
     devDependencies: devDeps,
+    commands: commands.flat(),
   };
 };
 

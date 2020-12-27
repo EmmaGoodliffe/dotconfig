@@ -41,10 +41,11 @@ const run = async (outputDir: string | number) => {
   const selectedTemplates = selectedPackages.map(pkg => templates[pkg]);
   const allDeps: string[] = [];
   const allDevDeps: string[] = [];
+  const fileCommands = [];
   for (let i = 0; i < selectedPackages.length; i++) {
     const pkg = selectedPackages[i];
     const selectedTemplate = selectedTemplates[i];
-    const { dependencies, devDependencies } = await template(
+    const { dependencies, devDependencies, commands } = await template(
       pkg,
       selectedTemplate,
       absoluteOutputDir,
@@ -52,18 +53,20 @@ const run = async (outputDir: string | number) => {
     );
     allDeps.push(...dependencies);
     allDevDeps.push(...devDependencies);
+    fileCommands.push(...commands);
   }
-  await writeFiles(
+  const npmCommand = await writeFiles(
     [{ file: "package.json", commands: ["npm init"], override: true }],
     outputDir,
   );
+  const npmCommands = [...npmCommand].flat();
   const allUniqueDeps = Array.from(new Set(allDeps));
   const allUniqueDevDeps = Array.from(new Set(allDevDeps));
   const depsCommand = `npm i ${allUniqueDeps.join(" ")}`;
   const devDepsCommand = `npm i -D ${allUniqueDevDeps.join(" ")}`;
-  const allCommands = [];
-  allUniqueDeps.length && allCommands.push(depsCommand);
-  allUniqueDevDeps.length && allCommands.push(devDepsCommand);
+  allUniqueDeps.length && npmCommands.push(depsCommand);
+  allUniqueDevDeps.length && npmCommands.push(devDepsCommand);
+  const allCommands = [...npmCommands, ...fileCommands];
   console.log({ allCommands });
 };
 
