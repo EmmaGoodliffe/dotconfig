@@ -50,7 +50,8 @@ export const writeFiles = (
     const path = resolve(outputDir, file.file);
     const dir = dirname(path);
     recursivelyCreateDir(dir);
-    const question = `${path} already exists. Do you want to override it?`;
+    const description = file.override ? "recommended" : "optional";
+    const question = `${path} already exists. Do you want to override it (${description})?`;
     const options = { default: file.override };
     const shouldWrite = !existsSync(path) || (await confirm(question, options));
     shouldWrite && raw && (await writeFile(path, raw));
