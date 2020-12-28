@@ -88,7 +88,7 @@ var getFile = function (url) { return __awaiter(void 0, void 0, void 0, function
 }); };
 var writeFiles = function (files, outputDir) {
     var promises = files.map(function (file) { return __awaiter(void 0, void 0, void 0, function () {
-        var fullDefaultUrl, url, raw, _a, path, dir, question, options, shouldWrite, _b, _c, result;
+        var fullDefaultUrl, url, raw, _a, path, dir, description, question, options, shouldWrite, _b, _c, result;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
@@ -105,7 +105,8 @@ var writeFiles = function (files, outputDir) {
                     path = path_1.resolve(outputDir, file.file);
                     dir = path_1.dirname(path);
                     recursivelyCreateDir(dir);
-                    question = path + " already exists. Do you want to override it?";
+                    description = file.override ? "recommended" : "optional";
+                    question = path + " already exists. Do you want to override it (" + description + ")?";
                     options = { default: file.override };
                     _b = !fs_1.existsSync(path);
                     if (_b) return [3 /*break*/, 4];
