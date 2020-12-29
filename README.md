@@ -8,7 +8,7 @@ Generate config files and boilerplate with ease
 - Prettier
 - Git
 - GitHub
-- Svelte with rollup
+- Svelte
 - Tailwind
 - API Extractor
 - Typescript
