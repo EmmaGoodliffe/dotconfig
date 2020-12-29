@@ -4,12 +4,12 @@ Generate config files and boilerplate with ease
 
 ## To do
 
+- API Extractor
 - ESLint
-- Prettier
 - Git
 - GitHub
+- Jest
+- Prettier
 - Svelte
 - Tailwind
-- API Extractor
 - Typescript
-- Jest
