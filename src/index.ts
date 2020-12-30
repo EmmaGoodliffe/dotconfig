@@ -1,10 +1,9 @@
-import { writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { checkboxes, confirm } from "input";
 import { join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
-import apiExtConfigBase from "./content/auto/api-extractor.json";
-import tsConfigBase from "./content/auto/tsconfig.json";
 
+const dir = join(__dirname, "../output");
 const packages = [
   "API Extractor",
   "ESLint",
@@ -61,7 +60,26 @@ const getEsLintConfig = (
   return base;
 };
 
-const dir = join(__dirname, "../output");
+const isObject = (obj: unknown): obj is Record<string, unknown> =>
+  obj instanceof Object && !(obj instanceof Array);
+
+const sortJson = <T>(object: T) => {
+  if (object instanceof Array) {
+    for (const i in object) {
+      object[i] = sortJson(object[i]);
+    }
+    return object;
+  } else if (isObject(object)) {
+    const keys = Object.keys(object).sort();
+    const newObject: Record<string, unknown> = {};
+    for (const i in keys) {
+      const key = keys[i];
+      newObject[key] = sortJson(object[key]);
+    }
+    return newObject as T;
+  }
+  return object;
+};
 
 const run = async () => {
   const requestedPackages = (await checkboxes(
@@ -75,17 +93,23 @@ const run = async () => {
       scripts.docs =
         "npm run build && api-extractor run --local && api-documenter markdown --input-folder temp --output-folder docs/md";
       const tsConfigPath = join(dir, "tsconfig.json");
-      const tsConfig = {
-        ...tsConfigBase,
-        compilerOptions: { declaration: true, declarationMap: true },
-      };
-      writeFileSync(tsConfigPath, JSON.stringify(tsConfig));
+      const tsConfigBasePath = join(__dirname, "content/auto/tsconfig.json");
+      const tsConfigBase = readFileSync(tsConfigBasePath).toString();
+      const tsConfig = tsConfigBase
+        .replace('// "declaration": true,', '"declaration": true,   ')
+        .replace('// "declarationMap": true,', '"declarationMap": true,   ');
+      writeFileSync(tsConfigPath, tsConfig);
       const apiExtConfigPath = join(dir, "api-extractor.json");
-      const apiExtConfig = {
-        ...apiExtConfigBase,
-        mainEntryPointFilePath: "dist/index.d.ts",
-      };
-      writeFileSync(apiExtConfigPath, JSON.stringify(apiExtConfig));
+      const apiExtConfigBasePath = join(
+        __dirname,
+        "content/auto/api-extractor.json",
+      );
+      const apiExtConfigBase = readFileSync(apiExtConfigBasePath).toString();
+      const apiExtConfig = apiExtConfigBase.replace(
+        '"mainEntryPointFilePath": "<projectFolder>/',
+        '"mainEntryPointFilePath": "',
+      );
+      writeFileSync(apiExtConfigPath, apiExtConfig);
     } else if (pkg === "ESLint") {
       devDependencies.push("eslint", "eslint-plugin-import");
       scripts.lint = 'eslint "." --fix && prettier "." --write';
@@ -107,7 +131,11 @@ const run = async () => {
           "@typescript-eslint/parser",
         );
       }
-      writeFileSync(esLintConfigPath, JSON.stringify(esLintConfig));
+      const sortedEsLintConfig = sortJson(esLintConfig);
+      writeFileSync(
+        esLintConfigPath,
+        JSON.stringify(sortedEsLintConfig, null, 2),
+      );
     }
   }
 };
