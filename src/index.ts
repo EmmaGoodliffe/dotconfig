@@ -114,9 +114,13 @@ const run = async () => {
       devDependencies.push("eslint", "eslint-plugin-import");
       scripts.lint = 'eslint "." --fix && prettier "." --write';
       const prettierQuestion = getExtensionQuestion(pkg, "Prettier");
-      const usePrettier = await confirm(prettierQuestion, { default: true });
+      const usePrettier =
+        requestedPackages.includes("Prettier") &&
+        (await confirm(prettierQuestion, { default: true }));
       const tsQuestion = getExtensionQuestion(pkg, "TypeScript");
-      const useTs = await confirm(tsQuestion, { default: true });
+      const useTs =
+        requestedPackages.includes("TypeScript") &&
+        (await confirm(tsQuestion, { default: true }));
       const esLintConfigPath = join(dir, ".eslintrc.json");
       let esLintConfig: EsLintConfig = { ...esLintConfigBase };
       if (usePrettier) {
