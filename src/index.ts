@@ -100,10 +100,21 @@ const write = (path: string, text: string) => {
   writeFileSync(path, text);
 };
 
+const sort = <T extends Record<string, unknown>>(obj: T) => {
+  const result: Record<string, unknown> = {};
+  for (const key of Object.keys(obj).sort()) {
+    result[key] = obj[key];
+  }
+  return result as T;
+};
+
+const unique = <T>(arr: T[]) => Array.from(new Set(arr));
+
 const run = async () => {
+  const choices = packages.map(pkg => ({ name: pkg }));
   const requestedPackages = (await checkboxes(
-    "Choose",
-    packages.map(pkg => ({ name: pkg })),
+    "Which packages would you like to configure?",
+    [...choices, { name: "---", disabled: true }],
   )) as Package[];
   const devDependencies: string[] = [];
   const commands: string[] = [];
@@ -185,10 +196,15 @@ const run = async () => {
       }
     } else if (pkg === "Jest") {
       devDependencies.push("jest");
+      scripts.test = "jest";
       if (requestedPackages.includes("TypeScript")) {
         devDependencies.push("ts-jest", "@types/jest");
+        const indexTestTsPath = join(dir, "index.test.ts");
+        write(indexTestTsPath, "");
         commands.push("npx ts-jest config:init");
       } else {
+        const indexTestJsPath = join(dir, "index.test.js");
+        write(indexTestJsPath, "");
         commands.push("npx jest --init");
       }
     } else if (pkg === "Prettier") {
@@ -204,6 +220,8 @@ const run = async () => {
         scripts["build:scss"] = "sass src/index.scss dist/index.css";
       }
     } else if (pkg === "Svelte") {
+      scripts["build:svelte"] = "rollup -c";
+      scripts["dev:svelte"] = "rollup -c -w";
       const rollupConfigPath = join(dir, "rollup.config.js");
       const rollupConfig = await getTemplateFile("rollup.config.js");
       write(rollupConfigPath, rollupConfig);
@@ -213,6 +231,16 @@ const run = async () => {
         commands.push("node scripts/tsSvelte.js");
         write(tsSveltePath, tsSvelte);
       } else {
+        devDependencies.push(
+          "@rollup/plugin-commonjs@^16.0.0",
+          "@rollup/plugin-node-resolve@^10.0.0",
+          "rollup@^2.3.4",
+          "rollup-plugin-css-only@^3.1.0",
+          "rollup-plugin-livereload@^2.0.0",
+          "rollup-plugin-svelte@^7.0.0",
+          "rollup-plugin-terser@^7.0.0",
+          "svelte@^3.0.0",
+        );
         const mainJsPath = join(dir, "src/main.js");
         const mainJs = [
           'import App from "./App.svelte";',
@@ -274,9 +302,26 @@ const run = async () => {
         commands.push("npx tailwindcss-cli@latest build -o src/tailwind.css");
       }
     } else if (pkg === "TypeScript") {
+      scripts["build:ts"] = "tsc";
       write(tsConfigPath, tsConfig);
     }
   }
+  let buildScript = "";
+  let devScript = "";
+  for (const script of Object.keys(scripts).sort()) {
+    if (script.includes("build:")) {
+      buildScript += ` && npm run ${script}`;
+    }
+    if (script.includes("dev:")) {
+      devScript += ` && npm run ${script}`;
+    }
+  }
+  buildScript = buildScript.slice(" && ".length);
+  devScript = devScript.slice(" && ".length);
+  scripts.build = buildScript;
+  scripts.dev = devScript;
+  commands.push(`npm i -D ${unique(devDependencies).sort().join(" ")}`);
+  console.log({ commands, scripts: sort(scripts) });
 };
 
 run().catch(console.error);
