@@ -15,6 +15,7 @@ const packages = [
   "GitHub",
   "Jest",
   "Prettier",
+  "SCSS",
   "Svelte",
   "Tailwind",
   "TypeScript",
@@ -191,14 +192,91 @@ const run = async () => {
         commands.push("npx jest --init");
       }
     } else if (pkg === "Prettier") {
+      if (!requestedPackages.includes("ESLint")) {
+        scripts.lint = 'prettier "." --write';
+      }
       const prettierConfigPath = join(dir, ".prettierrc");
       const prettierConfig = await getTemplateFile(".prettierrc");
       write(prettierConfigPath, prettierConfig);
+    } else if (pkg === "SCSS") {
+      devDependencies.push("sass");
+      if (!requestedPackages.includes("Tailwind")) {
+        scripts["build:scss"] = "sass src/index.scss dist/index.css";
+      }
     } else if (pkg === "Svelte") {
-      
+      const rollupConfigPath = join(dir, "rollup.config.js");
+      const rollupConfig = await getTemplateFile("rollup.config.js");
+      write(rollupConfigPath, rollupConfig);
+      if (requestedPackages.includes("TypeScript")) {
+        const tsSveltePath = join(dir, "scripts/tsSvelte.js");
+        const tsSvelte = await getTemplateFile("scripts/tsSvelte.js");
+        commands.push("node scripts/tsSvelte.js");
+        write(tsSveltePath, tsSvelte);
+      } else {
+        const mainJsPath = join(dir, "src/main.js");
+        const mainJs = [
+          'import App from "./App.svelte";',
+          "",
+          "const app = new App({",
+          "  target: document.body,",
+          "    props: {",
+          '      name: "world"',
+          "    }",
+          "});",
+          "",
+          "export default app;",
+        ].join("\n");
+        write(mainJsPath, mainJs);
+      }
+    } else if (pkg === "Tailwind") {
+      devDependencies.push("tailwindcss");
+      const tailwindConfigPath = join(dir, "tailwind.config.js");
+      const tailwindConfig = [
+        'const colors = require("tailwindcss/colors");',
+        "",
+        "module.exports = {",
+        "  theme: {",
+        "    extend: {",
+        "      colors: {",
+        "        cyan: colors.cyan,",
+        "      },",
+        "    },",
+        "  },",
+        "  variants: {},",
+        "  plugins: [],",
+        "}",
+      ].join("\n");
+      write(tailwindConfigPath, tailwindConfig);
+      if (await confirm("Would you like to use custom CSS with Tailwind?")) {
+        devDependencies.push("tailwindcss-cli");
+        const indexCss = [
+          "@tailwind base;",
+          "@tailwind components;",
+          "@tailwind utilities;",
+          "",
+          ".btn {",
+          "  @apply px-4 py-2 bg-cyan-500 text-white rounded font-bold;",
+          "}",
+        ].join("\n");
+        if (requestedPackages.includes("SCSS")) {
+          scripts["build:scss"] =
+            "sass src/index.scss src/index.css && tailwindcss-cli build src/index.css -o dist/index.css";
+          const indexScssPath = join(dir, "src/index.scss");
+          const indexScss = indexCss;
+          write(indexScssPath, indexScss);
+        } else {
+          scripts["build:css"] =
+            "tailwindcss-cli build src/index.css -o dist/index.css";
+          const indexCssPath = join(dir, "src/index.css");
+          write(indexCssPath, indexCss);
+        }
+      } else {
+        commands.push("npx tailwindcss-cli@latest build -o src/tailwind.css");
+      }
+    } else if (pkg === "TypeScript") {
+      write(tsConfigPath, tsConfig);
     }
   }
-  write(tsConfigPath, tsConfig);
 };
 
 run().catch(console.error);

@@ -11,6 +11,7 @@ Generate config files and boilerplate with ease
 - GitHub
 - Jest
 - Prettier
+- SCSS
 - Svelte
 - Tailwind
 - Typescript
