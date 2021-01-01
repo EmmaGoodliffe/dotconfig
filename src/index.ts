@@ -1,11 +1,15 @@
-import { readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { checkboxes, confirm } from "input";
-import { join } from "path";
+import fetch from "node-fetch";
+import { dirname, join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
 
 const dir = join(__dirname, "../output");
+const defaultUrl =
+  "https://raw.githubusercontent.com/EmmaGoodliffe/default/master/";
 const packages = [
   "API Extractor",
+  "Dotenv",
   "ESLint",
   "Git",
   "GitHub",
@@ -20,13 +24,13 @@ type Extends<T, U extends T> = U;
 
 type Package = typeof packages[number];
 
-const getExtensionQuestion = (base: Package, extension: Package) =>
-  `Do you want to configure ${base} with ${extension}?`;
-
 type EsLintConfig = typeof esLintConfigBase & {
   parser?: string;
   rules?: { [key: string]: unknown };
 };
+
+const getExtensionQuestion = (base: Package, extension: Package) =>
+  `Do you want to configure ${base} with ${extension}?`;
 
 const getEsLintConfig = (
   base: EsLintConfig,
@@ -81,24 +85,43 @@ const sortJson = <T>(object: T) => {
   return object;
 };
 
+const getTemplateFile = async (file: string) => {
+  const url = defaultUrl + file;
+  const response = await fetch(url);
+  const text = await response.text();
+  return text;
+};
+
+const write = (path: string, text: string) => {
+  const pathDir = dirname(path);
+  const exists = existsSync(pathDir);
+  !exists && mkdirSync(pathDir, { recursive: true });
+  writeFileSync(path, text);
+};
+
 const run = async () => {
   const requestedPackages = (await checkboxes(
     "Choose",
     packages.map(pkg => ({ name: pkg })),
   )) as Package[];
   const devDependencies: string[] = [];
+  const commands: string[] = [];
   const scripts: Record<string, string> = {};
+  const tsConfigPath = join(dir, "tsconfig.json");
+  let tsConfig = readFileSync(
+    join(__dirname, "content/auto/tsconfig.json"),
+  ).toString();
   for (const pkg of requestedPackages) {
     if (pkg === "API Extractor") {
+      devDependencies.push(
+        "@microsoft/api-extractor",
+        "@microsoft/api-documenter",
+      );
       scripts.docs =
         "npm run build && api-extractor run --local && api-documenter markdown --input-folder temp --output-folder docs/md";
-      const tsConfigPath = join(dir, "tsconfig.json");
-      const tsConfigBasePath = join(__dirname, "content/auto/tsconfig.json");
-      const tsConfigBase = readFileSync(tsConfigBasePath).toString();
-      const tsConfig = tsConfigBase
+      tsConfig = tsConfig
         .replace('// "declaration": true,', '"declaration": true,   ')
         .replace('// "declarationMap": true,', '"declarationMap": true,   ');
-      writeFileSync(tsConfigPath, tsConfig);
       const apiExtConfigPath = join(dir, "api-extractor.json");
       const apiExtConfigBasePath = join(
         __dirname,
@@ -109,7 +132,10 @@ const run = async () => {
         '"mainEntryPointFilePath": "<projectFolder>/',
         '"mainEntryPointFilePath": "',
       );
-      writeFileSync(apiExtConfigPath, apiExtConfig);
+      write(apiExtConfigPath, apiExtConfig);
+    } else if (pkg === "Dotenv") {
+      devDependencies.push("dotenv");
+      write(join(dir, ".env"), "");
     } else if (pkg === "ESLint") {
       devDependencies.push("eslint", "eslint-plugin-import");
       scripts.lint = 'eslint "." --fix && prettier "." --write';
@@ -130,18 +156,49 @@ const run = async () => {
       if (useTs) {
         esLintConfig = getEsLintConfig(esLintConfig, "TypeScript");
         devDependencies.push(
-          "typescript",
           "@typescript-eslint/eslint-plugin",
           "@typescript-eslint/parser",
         );
       }
       const sortedEsLintConfig = sortJson(esLintConfig);
-      writeFileSync(
-        esLintConfigPath,
-        JSON.stringify(sortedEsLintConfig, null, 2),
-      );
+      write(esLintConfigPath, JSON.stringify(sortedEsLintConfig, null, 2));
+    } else if (pkg === "Git") {
+      const gitIgnoreLines = ["node_modules"];
+      requestedPackages.includes("Dotenv") && gitIgnoreLines.push(".env");
+      const gitIgnore = gitIgnoreLines.join("\n");
+      const gitIgnorePath = join(dir, ".gitignore");
+      write(gitIgnorePath, gitIgnore);
+    } else if (pkg === "GitHub") {
+      const files = [
+        ".github/ISSUE_TEMPLATE/bug_report.md",
+        ".github/ISSUE_TEMPLATE/feature_request.md",
+        ".github/workflows/ci.yml",
+        ".github/PULL_REQUEST_TEMPLATE.md",
+      ];
+      const paths = files.map(file => join(dir, file));
+      const texts = await Promise.all(files.map(getTemplateFile));
+      for (const i in paths) {
+        const path = paths[i];
+        const text = texts[i];
+        write(path, text);
+      }
+    } else if (pkg === "Jest") {
+      devDependencies.push("jest");
+      if (requestedPackages.includes("TypeScript")) {
+        devDependencies.push("ts-jest", "@types/jest");
+        commands.push("npx ts-jest config:init");
+      } else {
+        commands.push("npx jest --init");
+      }
+    } else if (pkg === "Prettier") {
+      const prettierConfigPath = join(dir, ".prettierrc");
+      const prettierConfig = await getTemplateFile(".prettierrc");
+      write(prettierConfigPath, prettierConfig);
+    } else if (pkg === "Svelte") {
+      
     }
   }
+  write(tsConfigPath, tsConfig);
 };
 
 run().catch(console.error);
