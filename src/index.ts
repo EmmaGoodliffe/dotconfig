@@ -4,7 +4,6 @@ import fetch from "node-fetch";
 import { dirname, join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
 
-const dir = join(__dirname, "../output");
 const defaultUrl =
   "https://raw.githubusercontent.com/EmmaGoodliffe/default/master/";
 const packages = [
@@ -110,7 +109,12 @@ const sort = <T extends Record<string, unknown>>(obj: T) => {
 
 const unique = <T>(arr: T[]) => Array.from(new Set(arr));
 
-const run = async () => {
+const run = async (dir: string) => {
+  const packageJsonPath = join(dir, "package.json");
+  const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
+  if (!packageJsonExists) {
+    throw `Expected ${packageJsonPath} to exist`;
+  }
   const choices = packages.map(pkg => ({ name: pkg }));
   const requestedPackages = (await checkboxes(
     "Which packages would you like to configure?",
@@ -320,8 +324,15 @@ const run = async () => {
   devScript = devScript.slice(" && ".length);
   scripts.build = buildScript;
   scripts.dev = devScript;
+  const packageJsonBase = JSON.parse(readFileSync(packageJsonPath).toString());
+  const packageJson = {
+    ...packageJsonBase,
+    scripts: { ...packageJsonBase.scripts, ...sort(scripts) },
+  };
+  write(packageJsonPath, JSON.stringify(packageJson, null, 2));
   commands.push(`npm i -D ${unique(devDependencies).sort().join(" ")}`);
-  console.log({ commands, scripts: sort(scripts) });
+  console.log({ commands });
 };
 
-run().catch(console.error);
+const dir = join(__dirname, "../output");
+run(dir).catch(console.error);

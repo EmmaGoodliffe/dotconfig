@@ -4,9 +4,10 @@
   "description": "Generate config files and boilerplate with ease",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf src/content/auto/* && npm run build:init",
     "build:init": "cd src/content/auto && tsc --init && api-extractor init",
-    "dev": "rimraf output/* && ts-node src/index.ts",
+    "build": "rimraf src/content/auto/* && npm run build:init",
+    "dev:init": "rimraf output && mkdir output && cd output && npm init -y",
+    "dev": "npm run dev:init && ts-node src/index.ts",
     "lint": "eslint \".\" --fix && prettier \".\" --write",
     "test": "echo \"No test script yet\""
   },
