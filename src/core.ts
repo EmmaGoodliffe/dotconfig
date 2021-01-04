@@ -1,4 +1,4 @@
-import { spawnSync } from "child_process";
+import { spawn } from "child_process";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
@@ -21,12 +21,24 @@ const packages = [
 
 type Extends<T, U extends T> = U;
 
-export type Package = typeof packages[number];
+type PossiblePromise<T> = T | Promise<T>;
+
+type Package = typeof packages[number];
 
 type EsLintConfig = typeof esLintConfigBase & {
   parser?: string;
   rules?: { [key: string]: unknown };
 };
+
+interface Ui {
+  inputPackages: (allPackages: Package[]) => PossiblePromise<string[]>;
+  confirm: (label: string, defaultAnswer: boolean) => PossiblePromise<boolean>;
+  onPackageComplete: (pkg: Package) => PossiblePromise<void>;
+  onCommandError: (error: string) => PossiblePromise<void | never>;
+}
+
+const isPackage = (pkg: unknown): pkg is Package =>
+  packages.includes(pkg as Package);
 
 const getExtensionQuestion = (base: Package, extension: Package) =>
   `Do you want to configure ${base} with ${extension}?`;
@@ -63,15 +75,20 @@ const getEsLintConfig = (
   return base;
 };
 
-export default async (
-  dir: string,
-  inputPackages: Package[] | ((allPackages: Package[]) => Promise<Package[]>),
-  confirm: (label: string, defaultAnswer: boolean) => Promise<boolean>,
-): Promise<void> => {
-  const requestedPackages =
-    inputPackages instanceof Array
-      ? inputPackages
-      : await inputPackages([...packages]);
+const runCommand = (command: string, dir: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const words = command.split(" ");
+    const main = words[0];
+    const args = words.slice(1);
+    const output = spawn(main, args, { cwd: dir, stdio: "inherit" });
+    output.on("close", () => resolve());
+    output.on("error", err => reject(err));
+  });
+};
+
+export default async (dir: string, ui: Ui): Promise<void> => {
+  const { confirm, inputPackages, onPackageComplete, onCommandError } = ui;
+  const requestedPackages = await inputPackages([...packages]);
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
   if (!packageJsonExists) {
@@ -87,6 +104,9 @@ export default async (
   const indexJsPath = join(dir, "src/index.js");
   let indexJs = "";
   for (const pkg of requestedPackages) {
+    if (!isPackage(pkg)) {
+      throw new Error(`Expected a valid package. Received: ${pkg}`);
+    }
     if (pkg === "API Extractor") {
       devDependencies.push(
         "@microsoft/api-extractor",
@@ -268,6 +288,7 @@ export default async (
       const tsPath = join(dir, "src/index.ts");
       write(tsPath, "");
     }
+    await onPackageComplete(pkg);
   }
   if (requestedPackages.includes("TypeScript")) {
     write(tsConfigPath, tsConfig);
@@ -298,16 +319,10 @@ export default async (
     `npm i -D ${unique(devDependencies).sort().join(" ")}`;
   devDependenciesCommand && commands.push(devDependenciesCommand);
   for (const command of commands) {
-    const words = command.split(" ");
-    const main = words[0];
-    const args = words.slice(1);
-    const output = spawnSync(main, args, { cwd: dir });
-    const { stdout, stderr } = output;
-    console.log({ output });
-    if (stderr.toString()) {
-      throw new Error(`Error running ${command}: ${stderr}`);
+    try {
+      await runCommand(command, dir);
+    } catch (err) {
+      await onCommandError(err);
     }
-    const result = stdout.toString();
-    console.log({ result });
   }
 };
