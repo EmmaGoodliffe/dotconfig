@@ -15,6 +15,13 @@ Svelte - SCSS Tailwind TypeScript
 Tailwind - SCSS
 */
 
+const expectations = {
+  "API Extractor": {
+    files: ["api-extractor.json"],
+    patterns: [/@microsoft/],
+  },
+} as const;
+
 const parentDir = join(__dirname, "output");
 
 const reset = () => {
@@ -43,14 +50,19 @@ const getOptions = <T>(packages: T[]) => ({
   autoInstall: false,
 });
 
+const checkDeps = (deps: string[], patterns: RegExp[]) =>
+  patterns.every(pattern => deps.some(dep => pattern.test(dep)));
+
 beforeAll(reset);
 
 test("API Extractor", async () => {
+  expect.assertions(2);
   const dir = getDir();
   await core(dir, getOptions(["API Extractor"])).catch(err =>
     expect(err.message).toMatch("TypeScript"),
   );
   const deps = await core(dir, getOptions(["API Extractor", "TypeScript"]));
-  console.log({ deps });
-  expect(deps.filter(dep => dep.includes("@microsoft")).length).toBe(2);
+  expect(
+    checkDeps(deps, [...expectations["API Extractor"].patterns]),
+  ).toBeTruthy();
 });
