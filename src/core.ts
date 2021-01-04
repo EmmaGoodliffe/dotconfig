@@ -1,8 +1,7 @@
-import { spawn } from "child_process";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
-import { getTemplateFile, write } from "./io";
+import { getTemplateFile, runCommand, write } from "./io";
 import { sortJson, unique } from "./util";
 
 const packages = [
@@ -73,17 +72,6 @@ const getEsLintConfig = (
     };
   }
   return base;
-};
-
-const runCommand = (command: string, dir: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const words = command.split(" ");
-    const main = words[0];
-    const args = words.slice(1);
-    const output = spawn(main, args, { cwd: dir, stdio: "inherit" });
-    output.on("close", () => resolve());
-    output.on("error", err => reject(err));
-  });
 };
 
 export default async (dir: string, ui: Ui): Promise<void> => {
