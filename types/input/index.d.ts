@@ -1,15 +1,25 @@
-declare module "input" {
-  interface Choice<T> {
-    name: string;
-    value?: T;
-    disabled?: boolean;
-  }
+type Exactly<T, U> = T & Record<Exclude<keyof U, keyof T>, never>;
 
-  function checkboxes<T>(
+interface Choice<N extends string> {
+  name: N;
+  disabled?: boolean;
+}
+
+interface ChoiceWithValue<N, V> extends Choice<N> {
+  value?: V;
+}
+
+declare module "input" {
+  function checkboxes<N, T extends Exactly<Choice<N>, T>>(
     label: string,
-    choices: Choice<T>[],
-    options?: { validate?: (answer: T[]) => boolean },
-  ): Promise<T[]>;
+    choices: T[],
+    options?: { validate?: (answer: N[]) => boolean },
+  ): Promise<N[]>;
+  function checkboxes<N, V>(
+    label: string,
+    choices: ChoiceWithValue<N, V>[],
+    options?: { validate?: (answer: V[]) => boolean },
+  ): Promise<V[]>;
   function confirm(
     label: string,
     options?: { default?: boolean; validate?: (answer: boolean) => boolean },

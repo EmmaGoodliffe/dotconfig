@@ -1,62 +1,32 @@
-import { existsSync, mkdirSync, promises } from "fs";
-import { confirm } from "input";
+import { spawn } from "child_process";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 import fetch from "node-fetch";
-import { dirname, resolve } from "path";
-import { parse } from "url";
-import { File_ } from "./types";
-
-const { readFile, writeFile } = promises;
+import { dirname } from "path";
 
 const defaultUrl =
   "https://raw.githubusercontent.com/EmmaGoodliffe/default/master/";
 
-const recursivelyCreateDir = (path: string): void => {
-  const parent = dirname(path);
-  const pathExists = existsSync(path);
-  const parentExists = existsSync(parent);
-  if (pathExists) {
-    return;
-  } else if (parentExists) {
-    mkdirSync(path);
-    return;
-  } else {
-    recursivelyCreateDir(parent);
-    mkdirSync(path);
-    return;
-  }
+export const getTemplateFile = async (file: string): Promise<string> => {
+  const url = defaultUrl + file;
+  const response = await fetch(url);
+  const text = await response.text();
+  return text;
 };
 
-const getFile = async (url: string) => {
-  const isFile = parse(url).protocol === null;
-  if (isFile) {
-    const buffer = await readFile(resolve(__dirname, url));
-    const raw = buffer.toString();
-    return raw;
-  } else {
-    const response = await fetch(url);
-    const raw = await response.text();
-    return raw;
-  }
+export const write = (path: string, text: string): void => {
+  const pathDir = dirname(path);
+  const exists = existsSync(pathDir);
+  !exists && mkdirSync(pathDir, { recursive: true });
+  writeFileSync(path, text);
 };
 
-export const writeFiles = (
-  files: File_[],
-  outputDir: string,
-): Promise<string[][]> => {
-  const promises = files.map(async file => {
-    const fullDefaultUrl = file.commands ? null : defaultUrl + file.file;
-    const url = file.url || fullDefaultUrl;
-    const raw = url && (await getFile(url));
-    const path = resolve(outputDir, file.file);
-    const dir = dirname(path);
-    recursivelyCreateDir(dir);
-    const description = file.override ? "recommended" : "optional";
-    const question = `${path} already exists. Do you want to override it (${description})?`;
-    const options = { default: file.override };
-    const shouldWrite = !existsSync(path) || (await confirm(question, options));
-    shouldWrite && raw && (await writeFile(path, raw));
-    const result = shouldWrite && file.commands;
-    return result || [];
+export const runCommand = (command: string, dir: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const words = command.split(" ");
+    const main = words[0];
+    const args = words.slice(1);
+    const output = spawn(main, args, { cwd: dir, stdio: "inherit" });
+    output.on("close", () => resolve());
+    output.on("error", err => reject(err));
   });
-  return Promise.all(promises);
 };
