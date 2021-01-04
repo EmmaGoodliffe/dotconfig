@@ -4,12 +4,12 @@
   "description": "Generate config files and boilerplate with ease",
   "main": "index.js",
   "scripts": {
-    "build:init": "cd src/content/auto && tsc --init && api-extractor init",
-    "build": "rimraf src/content/auto/* && npm run build:init",
+    "build:init": "rimraf src/content/auto/* && cd src/content/auto && tsc --init && api-extractor init",
+    "build": "npm run build:init",
     "dev:init": "rimraf output && mkdir output && cd output && npm init -y",
     "dev": "npm run dev:init && ts-node src/index.ts",
-    "lint": "eslint \".\" --fix && prettier \".\" --write",
-    "test": "echo \"No test script yet\""
+    "lint": "npm run dev:init && eslint \".\" --fix && prettier \".\" --write",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   "homepage": "https://github.com/EmmaGoodliffe/dotconfig#readme",
   "devDependencies": {
     "@microsoft/api-extractor": "^7.12.1",
+    "@types/jest": "^26.0.19",
     "@types/node": "^14.14.14",
     "@types/node-fetch": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^4.10.0",
@@ -30,8 +31,10 @@
     "eslint": "^7.15.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.3.0",
+    "jest": "^26.6.3",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
+    "ts-jest": "^26.4.4",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
