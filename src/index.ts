@@ -33,7 +33,6 @@ interface Ui {
   confirm: (label: string, defaultAnswer: boolean) => PossiblePromise<boolean>;
   inputPackages: (allPackages: Package[]) => PossiblePromise<Package[]>;
   onCommandError: (error: string) => PossiblePromise<void>;
-  onPackageComplete?: (pkg: Package) => PossiblePromise<void>;
 }
 
 interface Options {
@@ -47,7 +46,7 @@ const isPackage = (pkg: unknown): pkg is Package =>
 const getExtensionQuestion = (base: Package, extension: Package) =>
   `Do you want to configure ${base} with ${extension}?`;
 
-const getEsLintConfig = (
+const extendEsLintConfig = (
   base: EsLintConfig,
   extension: Extends<Package, "Prettier" | "TypeScript">,
 ) => {
@@ -81,7 +80,7 @@ const getEsLintConfig = (
 
 export default async (dir: string, options: Options): Promise<string[]> => {
   const { ui, autoInstall } = options;
-  const { confirm, inputPackages, onPackageComplete, onCommandError } = ui;
+  const { confirm, inputPackages, onCommandError } = ui;
   const requestedPackages = await inputPackages([...packages]);
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
@@ -130,7 +129,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       write(join(dir, ".env"), "");
     } else if (pkg === "ESLint") {
       devDependencies.push("eslint", "eslint-plugin-import");
-      scripts.lint = 'eslint "." --fix && prettier "." --write';
+      scripts.lint = 'eslint "." --fix';
       const prettierQuestion = getExtensionQuestion(pkg, "Prettier");
       const usePrettier =
         requestedPackages.includes("Prettier") &&
@@ -142,11 +141,12 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       const esLintConfigPath = join(dir, ".eslintrc.json");
       let esLintConfig: EsLintConfig = { ...esLintConfigBase };
       if (usePrettier) {
-        esLintConfig = getEsLintConfig(esLintConfig, "Prettier");
+        scripts.lint += ' && prettier "." --write';
+        esLintConfig = extendEsLintConfig(esLintConfig, "Prettier");
         devDependencies.push("prettier", "eslint-plugin-prettier");
       }
       if (useTs) {
-        esLintConfig = getEsLintConfig(esLintConfig, "TypeScript");
+        esLintConfig = extendEsLintConfig(esLintConfig, "TypeScript");
         devDependencies.push(
           "@typescript-eslint/eslint-plugin",
           "@typescript-eslint/parser",
@@ -286,7 +286,6 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       const tsPath = join(dir, "src/index.ts");
       write(tsPath, "");
     }
-    onPackageComplete && (await onPackageComplete(pkg));
   }
   if (requestedPackages.includes("TypeScript")) {
     write(tsConfigPath, tsConfig);

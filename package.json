@@ -6,9 +6,9 @@
   "scripts": {
     "build:init": "rimraf src/content/auto/* && cd src/content/auto && tsc --init && api-extractor init",
     "build": "npm run build:init",
-    "dev:init": "rimraf output && mkdir output && cd output && npm init -y",
-    "dev": "npm run dev:init && ts-node src/index.ts",
+    "dev": "ts-node test/manual.ts",
     "lint": "npm run dev:init && eslint \".\" --fix && prettier \".\" --write",
+    "test:reset": "ts-node test/reset.ts",
     "test": "jest"
   },
   "repository": {
@@ -39,6 +39,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "chalk": "^4.1.0",
     "input": "^1.0.1",
     "node-fetch": "^2.6.1"
   }
