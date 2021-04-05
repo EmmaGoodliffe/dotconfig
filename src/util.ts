@@ -1,4 +1,4 @@
-export const isObject = (obj: unknown): obj is Record<string, unknown> =>
+const isObject = (obj: unknown): obj is Record<string, unknown> =>
   obj instanceof Object && !(obj instanceof Array);
 
 export const unique = <T>(arr: T[]): T[] => Array.from(new Set(arr));
