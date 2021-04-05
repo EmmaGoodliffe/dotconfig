@@ -1,7 +1,7 @@
+export const unique = <T>(arr: T[]): T[] => Array.from(new Set(arr));
+
 const isObject = (obj: unknown): obj is Record<string, unknown> =>
   obj instanceof Object && !(obj instanceof Array);
-
-export const unique = <T>(arr: T[]): T[] => Array.from(new Set(arr));
 
 export const sortJson = <T>(object: T): T => {
   if (object instanceof Array) {
