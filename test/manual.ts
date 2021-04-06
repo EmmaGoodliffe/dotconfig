@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, rmdirSync } from "fs";
 import { checkboxes, confirm } from "input";
 import { join } from "path";
 import core from "../src";
-import { error } from "../src/io";
+import { logError } from "./io";
 
 const dir = join(__dirname, "output", "manual");
 existsSync(dir) && rmdirSync(dir, { recursive: true });
@@ -25,4 +25,4 @@ core(dir, {
       throw new Error(`Command error: ${err}`);
     },
   },
-}).catch(error);
+}).catch(logError);

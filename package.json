@@ -2,12 +2,18 @@
   "name": "dotconfig",
   "version": "1.0.0",
   "description": "Generate config files and boilerplate with ease",
-  "main": "index.js",
+  "main": "bin/index.js",
+  "files": [
+    "bin"
+  ],
+  "bin": {
+    "dotconfig": "bin/index.js"
+  },
   "scripts": {
-    "build:init": "rimraf src/content/auto/* && cd src/content/auto && tsc --init && api-extractor init",
-    "build": "npm run build:init",
+    "build": "tsc && ts-node scripts/build.ts",
     "dev": "ts-node test/manual.ts",
-    "lint": "npm run dev:init && eslint \".\" --fix && prettier \".\" --write",
+    "lint": "eslint \".\" --fix && prettier \".\" --write",
+    "prebuild": "ts-node scripts/prebuild.ts && cd bin/content/auto && tsc --init && api-extractor init",
     "test:reset": "ts-node test/reset.ts",
     "test": "jest"
   },
@@ -22,7 +28,7 @@
   },
   "homepage": "https://github.com/EmmaGoodliffe/dotconfig#readme",
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.12.1",
+    "@microsoft/api-extractor": "^7.13.2",
     "@types/jest": "^26.0.19",
     "@types/node": "^14.14.14",
     "@types/node-fetch": "^2.5.7",

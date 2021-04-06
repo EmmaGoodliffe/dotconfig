@@ -21,15 +21,12 @@ export const write = (path: string, text: string): void => {
   writeFileSync(path, text);
 };
 
-const title = (content: string) =>
+const logTitle = (content: string) =>
   console.log(chalk.blue(`=== ${content} ===`));
-
-export const error = (err: string | Error): void =>
-  console.error(chalk.red(err));
 
 export const runCommand = (command: string, dir: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    title(command);
+    logTitle(command);
     const words = command.split(" ");
     const main = words[0];
     const args = words.slice(1);
