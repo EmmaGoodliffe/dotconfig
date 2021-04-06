@@ -58,7 +58,10 @@ var getTemplateFile = function (file) { return __awaiter(void 0, void 0, void 0,
                 return [4 /*yield*/, response.text()];
             case 2:
                 text = _a.sent();
-                return [2 /*return*/, text];
+                if (response.ok) {
+                    return [2 /*return*/, text];
+                }
+                throw new Error("Template file " + chalk_1.default.blue(url) + " failed (" + chalk_1.default.red(response.status) + "): " + chalk_1.default.red(text));
         }
     });
 }); };

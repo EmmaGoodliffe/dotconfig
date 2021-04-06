@@ -17,6 +17,7 @@ const packages = [
   "Tailwind",
   "TypeScript",
 ] as const;
+const autoTemplateDir = join(__dirname, "../bin/content/auto");
 
 type Extends<T, U extends T> = U;
 
@@ -26,13 +27,13 @@ type Package = typeof packages[number];
 
 type EsLintConfig = typeof esLintConfigBase & {
   parser?: string;
-  rules?: { [key: string]: unknown };
+  rules?: Record<string, unknown>;
 };
 
 interface Ui {
   confirm: (label: string, defaultAnswer: boolean) => PossiblePromise<boolean>;
   inputPackages: (allPackages: Package[]) => PossiblePromise<Package[]>;
-  onCommandError: (error: string) => PossiblePromise<void>;
+  onCommandError: (command: string, err: string) => PossiblePromise<void>;
 }
 
 interface Options {
@@ -92,7 +93,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const scripts: Record<string, string> = {};
   const tsConfigPath = join(dir, "tsconfig.json");
   let tsConfig = readFileSync(
-    join(__dirname, "content/auto/tsconfig.json"),
+    join(autoTemplateDir, "tsconfig.json"),
   ).toString();
   const indexJsPath = join(dir, "src/index.js");
   let indexJs = "";
@@ -111,19 +112,17 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       scripts.docs =
         "npm run build && api-extractor run --local && api-documenter markdown --input-folder temp --output-folder docs/md";
       tsConfig = tsConfig
-        .replace('// "declaration": true,', '"declaration": true,   ')
-        .replace('// "declarationMap": true,', '"declarationMap": true,   ');
-      const apiExtConfigPath = join(dir, "api-extractor.json");
-      const apiExtConfigBasePath = join(
-        __dirname,
-        "content/auto/api-extractor.json",
-      );
-      const apiExtConfigBase = readFileSync(apiExtConfigBasePath).toString();
-      const apiExtConfig = apiExtConfigBase.replace(
-        '"mainEntryPointFilePath": "<projectFolder>/',
-        '"mainEntryPointFilePath": "',
-      );
-      write(apiExtConfigPath, apiExtConfig);
+        .replace('// "declaration":', '"declaration":')
+        .replace('// "declarationMap":', '"declarationMap":');
+      // const apiExtConfigPath = join(dir, "api-extractor.json");
+      // const apiExtConfigBasePath = join(autoTemplateDir, "api-extractor.json");
+      // const apiExtConfigBase = readFileSync(apiExtConfigBasePath).toString();
+      // const apiExtConfig = apiExtConfigBase.replace(
+      //   '"mainEntryPointFilePath": "<projectFolder>/',
+      //   '"mainEntryPointFilePath": "',
+      // );
+      // write(apiExtConfigPath, apiExtConfig);
+      commands.push("npx api-extractor init");
     } else if (pkg === "Dotenv") {
       devDependencies.push("dotenv");
       write(join(dir, ".env"), "");
@@ -319,7 +318,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
     try {
       await runCommand(command, dir);
     } catch (err) {
-      await onCommandError(err);
+      await onCommandError(command, err);
     }
   }
   return finalDevDependencies;

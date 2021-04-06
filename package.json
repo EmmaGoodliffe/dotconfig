@@ -13,8 +13,7 @@
     "build": "tsc && ts-node scripts/build.ts",
     "dev": "ts-node test/manual.ts",
     "lint": "eslint \".\" --fix && prettier \".\" --write",
-    "prebuild": "ts-node scripts/prebuild.ts && cd bin/content/auto && tsc --init && api-extractor init",
-    "test:reset": "ts-node test/reset.ts",
+    "prebuild": "ts-node scripts/prebuild.ts && cd bin/content/auto && tsc --init",
     "test": "jest"
   },
   "repository": {
@@ -28,7 +27,6 @@
   },
   "homepage": "https://github.com/EmmaGoodliffe/dotconfig#readme",
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.13.2",
     "@types/jest": "^26.0.19",
     "@types/node": "^14.14.14",
     "@types/node-fetch": "^2.5.7",

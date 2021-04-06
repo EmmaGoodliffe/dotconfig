@@ -1,9 +1,9 @@
+import chalk from "chalk";
 import { spawnSync } from "child_process";
 import { existsSync, mkdirSync, rmdirSync } from "fs";
 import { checkboxes, confirm } from "input";
 import { join } from "path";
 import core from "../src";
-import { logError } from "./io";
 
 const dir = join(__dirname, "output", "manual");
 existsSync(dir) && rmdirSync(dir, { recursive: true });
@@ -21,8 +21,8 @@ core(dir, {
         allPackages.map(pkg => ({ name: pkg })),
       );
     },
-    onCommandError(err) {
-      throw new Error(`Command error: ${err}`);
+    onCommandError(command, err) {
+      throw new Error(`Command error running ${chalk.blue(command)}: ${err}`);
     },
   },
-}).catch(logError);
+}).catch(console.error);

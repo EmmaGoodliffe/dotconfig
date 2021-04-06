@@ -76,6 +76,7 @@ var packages = [
     "Tailwind",
     "TypeScript",
 ];
+var autoTemplateDir = path_1.join(__dirname, "../bin/content/auto");
 var isPackage = function (pkg) {
     return packages.includes(pkg);
 };
@@ -98,7 +99,7 @@ var extendEsLintConfig = function (base, extension) {
     return base;
 };
 exports.default = (function (dir, options) { return __awaiter(void 0, void 0, void 0, function () {
-    var ui, autoInstall, confirm, inputPackages, onCommandError, requestedPackages, packageJsonPath, packageJsonExists, devDependencies, commands, scripts, tsConfigPath, tsConfig, indexJsPath, indexJs, _i, requestedPackages_1, pkg, apiExtConfigPath, apiExtConfigBasePath, apiExtConfigBase, apiExtConfig, prettierQuestion, usePrettier, _a, tsQuestion, useTs, _b, esLintConfigPath, esLintConfig, sortedEsLintConfig, gitIgnoreLines, gitIgnore, gitIgnorePath, files, paths, texts, i, path, text, indexTestTsPath, indexTestJsPath, prettierConfigPath, prettierConfig, rollupConfigPath, rollupConfig, tsSveltePath, tsSvelte, tailwindConfigPath, tailwindConfig, question, indexCss, indexScssPath, indexScss, indexCssPath, tsPath, buildScript, devScript, _c, _d, script, packageJsonBase, allScripts, packageJson, finalDevDependencies, shouldInstall, _e, commands_1, command, err_1;
+    var ui, autoInstall, confirm, inputPackages, onCommandError, requestedPackages, packageJsonPath, packageJsonExists, devDependencies, commands, scripts, tsConfigPath, tsConfig, indexJsPath, indexJs, _i, requestedPackages_1, pkg, prettierQuestion, usePrettier, _a, tsQuestion, useTs, _b, esLintConfigPath, esLintConfig, sortedEsLintConfig, gitIgnoreLines, gitIgnore, gitIgnorePath, files, paths, texts, i, path, text, indexTestTsPath, indexTestJsPath, prettierConfigPath, prettierConfig, rollupConfigPath, rollupConfig, tsSveltePath, tsSvelte, tailwindConfigPath, tailwindConfig, question, indexCss, indexScssPath, indexScss, indexCssPath, tsPath, buildScript, devScript, _c, _d, script, packageJsonBase, allScripts, packageJson, finalDevDependencies, shouldInstall, _e, commands_1, command, err_1;
     return __generator(this, function (_f) {
         switch (_f.label) {
             case 0:
@@ -116,7 +117,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 commands = [];
                 scripts = {};
                 tsConfigPath = path_1.join(dir, "tsconfig.json");
-                tsConfig = fs_1.readFileSync(path_1.join(__dirname, "content/auto/tsconfig.json")).toString();
+                tsConfig = fs_1.readFileSync(path_1.join(autoTemplateDir, "tsconfig.json")).toString();
                 indexJsPath = path_1.join(dir, "src/index.js");
                 indexJs = "";
                 _i = 0, requestedPackages_1 = requestedPackages;
@@ -135,13 +136,17 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 scripts.docs =
                     "npm run build && api-extractor run --local && api-documenter markdown --input-folder temp --output-folder docs/md";
                 tsConfig = tsConfig
-                    .replace('// "declaration": true,', '"declaration": true,   ')
-                    .replace('// "declarationMap": true,', '"declarationMap": true,   ');
-                apiExtConfigPath = path_1.join(dir, "api-extractor.json");
-                apiExtConfigBasePath = path_1.join(__dirname, "content/auto/api-extractor.json");
-                apiExtConfigBase = fs_1.readFileSync(apiExtConfigBasePath).toString();
-                apiExtConfig = apiExtConfigBase.replace('"mainEntryPointFilePath": "<projectFolder>/', '"mainEntryPointFilePath": "');
-                io_1.write(apiExtConfigPath, apiExtConfig);
+                    .replace('// "declaration":', '"declaration":')
+                    .replace('// "declarationMap":', '"declarationMap":');
+                // const apiExtConfigPath = join(dir, "api-extractor.json");
+                // const apiExtConfigBasePath = join(autoTemplateDir, "api-extractor.json");
+                // const apiExtConfigBase = readFileSync(apiExtConfigBasePath).toString();
+                // const apiExtConfig = apiExtConfigBase.replace(
+                //   '"mainEntryPointFilePath": "<projectFolder>/',
+                //   '"mainEntryPointFilePath": "',
+                // );
+                // write(apiExtConfigPath, apiExtConfig);
+                commands.push("npx api-extractor init");
                 return [3 /*break*/, 24];
             case 3:
                 if (!(pkg === "Dotenv")) return [3 /*break*/, 4];
@@ -381,7 +386,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 return [3 /*break*/, 31];
             case 29:
                 err_1 = _f.sent();
-                return [4 /*yield*/, onCommandError(err_1)];
+                return [4 /*yield*/, onCommandError(command, err_1)];
             case 30:
                 _f.sent();
                 return [3 /*break*/, 31];

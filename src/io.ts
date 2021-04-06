@@ -11,7 +11,14 @@ export const getTemplateFile = async (file: string): Promise<string> => {
   const url = defaultUrl + file;
   const response = await fetch(url);
   const text = await response.text();
-  return text;
+  if (response.ok) {
+    return text;
+  }
+  throw new Error(
+    `Template file ${chalk.blue(url)} failed (${chalk.red(
+      response.status,
+    )}): ${chalk.red(text)}`,
+  );
 };
 
 export const write = (path: string, text: string): void => {
