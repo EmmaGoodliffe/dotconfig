@@ -122,7 +122,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       //   '"mainEntryPointFilePath": "',
       // );
       // write(apiExtConfigPath, apiExtConfig);
-      commands.push("npx api-extractor init");
+      commands.push("npx @microsoft/api-extractor init");
     } else if (pkg === "Dotenv") {
       devDependencies.push("dotenv");
       write(join(dir, ".env"), "");
@@ -207,6 +207,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       if (requestedPackages.includes("TypeScript")) {
         const tsSveltePath = join(dir, "scripts/tsSvelte.js");
         const tsSvelte = await getTemplateFile("scripts/tsSvelte.js");
+        devDependencies.push("@tsconfig/svelte");
         commands.push("node scripts/tsSvelte.js");
         write(tsSveltePath, tsSvelte);
       } else {
@@ -280,7 +281,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         commands.push("npx tailwindcss-cli@latest build -o src/tailwind.css");
       }
     } else if (pkg === "TypeScript") {
-      devDependencies.push("tsc");
+      devDependencies.push("typescript");
       scripts["build:ts"] = "tsc";
       const tsPath = join(dir, "src/index.ts");
       write(tsPath, "");

@@ -146,7 +146,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 //   '"mainEntryPointFilePath": "',
                 // );
                 // write(apiExtConfigPath, apiExtConfig);
-                commands.push("npx api-extractor init");
+                commands.push("npx @microsoft/api-extractor init");
                 return [3 /*break*/, 24];
             case 3:
                 if (!(pkg === "Dotenv")) return [3 /*break*/, 4];
