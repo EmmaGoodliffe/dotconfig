@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { spawnSync } from "child_process";
 import { existsSync, mkdirSync, rmdirSync } from "fs";
 import { checkboxes, confirm } from "input";
 import { join } from "path";
@@ -8,7 +7,6 @@ import core from "../src";
 const dir = join(__dirname, "output", "manual");
 existsSync(dir) && rmdirSync(dir, { recursive: true });
 mkdirSync(dir, { recursive: true });
-spawnSync("npm", ["init", "-y"], { cwd: dir });
 
 core(dir, {
   ui: {
@@ -22,7 +20,9 @@ core(dir, {
       );
     },
     onCommandError(command, err) {
-      throw new Error(`Command error running ${chalk.blue(command)}: ${err}`);
+      throw new Error(
+        `Command error running ${chalk.blue(command)}: ${chalk.red(err)}`,
+      );
     },
   },
 }).catch(console.error);

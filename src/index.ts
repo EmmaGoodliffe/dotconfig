@@ -36,7 +36,7 @@ interface Ui {
   onCommandError: (command: string, err: string) => PossiblePromise<void>;
 }
 
-interface Options {
+export interface Options {
   ui: Ui;
   testing?: boolean;
 }
@@ -45,7 +45,7 @@ const isPackage = (pkg: unknown): pkg is Package =>
   packages.includes(pkg as Package);
 
 const getExtensionQuestion = (base: Package, extension: Package) =>
-  `Do you want to configure ${base} with ${extension}?`;
+  `Would you like to configure ${base} with ${extension}?`;
 
 const extendEsLintConfig = (
   base: EsLintConfig,
@@ -85,9 +85,9 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const requestedPackages = await inputPackages([...packages]);
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
-  if (!packageJsonExists) {
-    throw new Error(`Expected ${packageJsonPath} to exist`);
-  }
+  !packageJsonExists &&
+    (await confirm("Do you want to create a package.json file?", true)) &&
+    runCommand("npm init", dir);
   const devDependencies: string[] = [];
   const commands: string[] = [];
   const scripts: Record<string, string> = {};

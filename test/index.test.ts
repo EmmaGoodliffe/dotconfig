@@ -6,7 +6,9 @@ import core from "../src";
 const parentDir = join(__dirname, "output");
 
 const ui = {
-  confirm: (label: string, defaultAnswer: boolean) => defaultAnswer,
+  confirm(label: string, defaultAnswer: boolean) {
+    return defaultAnswer;
+  },
   onCommandError(err: string) {
     throw new Error(err);
   },
