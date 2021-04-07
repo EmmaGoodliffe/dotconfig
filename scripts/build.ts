@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import { basename, join } from "path";
 import { logCompletion } from "./io";
 
-const path = join(__dirname, "../dist/index.js");
+const path = join(__dirname, "../dist/cli.js");
 const shebang = "#! /usr/bin/env node";
 
 if (existsSync(path)) {

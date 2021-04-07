@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -41,13 +42,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ui = void 0;
 var chalk_1 = __importDefault(require("chalk"));
+var dotenv_1 = require("dotenv");
 var fs_1 = require("fs");
 var input_1 = require("input");
 var path_1 = require("path");
 var yargs_1 = require("yargs");
-var package_json_1 = require("../package.json");
 var help_1 = __importDefault(require("./help"));
 var index_1 = __importDefault(require("./index"));
+dotenv_1.config();
+var version = process.env.VERSION;
 var helpTip = "Run " + chalk_1.default.blue("dotconfig --help") + " for documentation";
 exports.ui = {
     confirm: function (label, defaultAnswer) {
@@ -70,11 +73,11 @@ var run = function () { return __awaiter(void 0, void 0, void 0, function () {
         switch (_a.label) {
             case 0:
                 if (yargs_1.argv.help) {
-                    console.log(help_1.default(package_json_1.version));
+                    console.log(help_1.default(version));
                     return [2 /*return*/];
                 }
                 if (yargs_1.argv.v || yargs_1.argv.version) {
-                    console.log(package_json_1.version);
+                    console.log(version);
                     return [2 /*return*/];
                 }
                 if (yargs_1.argv._.length === 0) {
