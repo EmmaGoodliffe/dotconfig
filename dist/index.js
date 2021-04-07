@@ -75,7 +75,7 @@ var packages = [
     "Tailwind",
     "TypeScript",
 ];
-var autoTemplateDir = path_1.join(__dirname, "../bin/content/auto");
+var autoTemplateDir = path_1.join(__dirname, "../dist/content/auto");
 var isPackage = function (pkg) {
     return packages.includes(pkg);
 };

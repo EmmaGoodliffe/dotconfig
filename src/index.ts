@@ -17,7 +17,7 @@ const packages = [
   "Tailwind",
   "TypeScript",
 ] as const;
-const autoTemplateDir = join(__dirname, "../bin/content/auto");
+const autoTemplateDir = join(__dirname, "../dist/content/auto");
 
 type Extends<T, U extends T> = U;
 
