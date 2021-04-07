@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, rmdirSync } from "fs";
 import { basename, join } from "path";
 import { logCompletion } from "./io";
 
-const path = join(__dirname, "../bin");
+const path = join(__dirname, "../dist");
 
 if (existsSync(path)) {
   rmdirSync(path, { recursive: true });
