@@ -1,14 +1,16 @@
 import chalk from "chalk";
+import { config } from "dotenv";
 import { existsSync, mkdirSync } from "fs";
 import { checkboxes, confirm } from "input";
 import { dirname, join } from "path";
 import { argv } from "yargs";
-import { version } from "../package.json";
 import helpDocs from "./help";
 import core, { Options } from "./index";
 
-const helpTip = `Run ${chalk.blue("dotconfig --help")} for documentation`;
+config();
 
+const version = process.env.VERSION as string;
+const helpTip = `Run ${chalk.blue("dotconfig --help")} for documentation`;
 export const ui: Ui = {
   confirm(label, defaultAnswer) {
     return confirm(label, { default: defaultAnswer });
