@@ -1,8 +1,7 @@
 import { spawnSync } from "child_process";
-import { mkdirSync, readFileSync } from "fs";
+import { mkdirSync, readdirSync, readFileSync, rmdirSync } from "fs";
 import { join } from "path";
 import core from "../src";
-import { reset } from "./io";
 
 /*
 API Extractor - TypeScript
@@ -49,6 +48,13 @@ const getFile = (dir: string, path: string) =>
 
 const getPackageJson = (dir: string) =>
   JSON.parse(getFile(dir, "package.json")) as PackageJson;
+
+const reset = (parentDir: string): void => {
+  for (const childDir of readdirSync(parentDir)) {
+    const path = join(parentDir, childDir);
+    rmdirSync(path, { recursive: true });
+  }
+};
 
 beforeAll(() => reset(parentDir));
 

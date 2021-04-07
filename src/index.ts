@@ -38,7 +38,7 @@ interface Ui {
 
 interface Options {
   ui: Ui;
-  autoInstall?: boolean;
+  testing?: boolean;
 }
 
 const isPackage = (pkg: unknown): pkg is Package =>
@@ -80,7 +80,7 @@ const extendEsLintConfig = (
 };
 
 export default async (dir: string, options: Options): Promise<string[]> => {
-  const { ui, autoInstall } = options;
+  const { ui, testing } = options;
   const { confirm, inputPackages, onCommandError } = ui;
   const requestedPackages = await inputPackages([...packages]);
   const packageJsonPath = join(dir, "package.json");
@@ -313,7 +313,8 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   write(packageJsonPath, JSON.stringify(packageJson, null, 2));
   const finalDevDependencies = unique(devDependencies).sort();
   const shouldInstall =
-    (autoInstall === false ? false : true) && devDependencies.length;
+    !testing &&
+    (await confirm("Would you like to install NPM dependencies now?", true));
   shouldInstall && commands.push(`npm i -D ${finalDevDependencies.join(" ")}`);
   for (const command of commands) {
     try {

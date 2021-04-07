@@ -21,7 +21,7 @@ const getDir = () => {
 
 const getOptions = <T>(packages: T[]) => ({
   ui: { ...ui, inputPackages: () => packages },
-  autoInstall: false,
+  testing: true,
 });
 
 const checkDeps = (deps: string[], patterns: RegExp[]) =>
@@ -44,17 +44,21 @@ const reset = (parentDir: string): void => {
 
 beforeAll(() => reset(parentDir));
 
-test("API Extractor", async () => {
-  await core(getDir(), getOptions(["API Extractor"])).catch(err =>
-    expect(err.message).toMatch("TypeScript"),
-  );
-  const dir = getDir();
-  const deps = await core(dir, getOptions(["API Extractor", "TypeScript"]));
-  const packageJson = getPackageJson(dir);
-  expect(checkDeps(deps, [/@microsoft/])).toBeTruthy();
-  expect(packageJson.scripts.docs).toMatch("api-extractor");
-  expect(getFile(dir, "tsconfig.json")).not.toMatch('// "declaration"');
-  expect(getFile(dir, "tsconfig.json")).not.toMatch(
-    '"mainEntryPointFilePath": "<projectFolder>/',
-  );
-});
+test(
+  "API Extractor",
+  async () => {
+    await core(getDir(), getOptions(["API Extractor"])).catch(err =>
+      expect(err.message).toMatch("TypeScript"),
+    );
+    const dir = getDir();
+    const deps = await core(dir, getOptions(["API Extractor", "TypeScript"]));
+    const packageJson = getPackageJson(dir);
+    expect(checkDeps(deps, [/@microsoft/])).toBeTruthy();
+    expect(packageJson.scripts.docs).toMatch("api-extractor");
+    expect(getFile(dir, "tsconfig.json")).not.toMatch('// "declaration"');
+    expect(getFile(dir, "tsconfig.json")).not.toMatch(
+      '"mainEntryPointFilePath": "<projectFolder>/',
+    );
+  },
+  2 * 60 * 1000,
+);
