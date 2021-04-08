@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, rmdirSync } from "fs";
 import { join } from "path";
 import core from "../src";
-import { ui } from "../src/cli";
+import ui from "../src/ui";
 
 const dir = join(__dirname, "output", "manual");
 existsSync(dir) && rmdirSync(dir, { recursive: true });
