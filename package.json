@@ -13,7 +13,7 @@
     "build": "tsc && ts-node scripts/build.ts",
     "dev": "ts-node test/manual.ts",
     "lint": "eslint \".\" --fix && prettier \".\" --write",
-    "prebuild": "ts-node scripts/prebuild.ts && cd dist/content/auto && tsc --init",
+    "prebuild": "ts-node scripts/prebuild.ts",
     "test": "jest"
   },
   "repository": {

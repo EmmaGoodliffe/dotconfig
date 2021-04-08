@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { checkboxes, confirm, select } from "input";
 import { Options } from "./index";
 
-const ui: Ui = {
+const ui: Options["ui"] = {
   confirm(label, defaultAnswer) {
     return confirm(label, { default: defaultAnswer });
   },
@@ -27,7 +27,5 @@ const ui: Ui = {
     );
   },
 };
-
-type Ui = Options["ui"];
 
 export default ui;

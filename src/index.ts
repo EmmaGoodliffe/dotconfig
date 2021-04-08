@@ -14,7 +14,6 @@ const allPackages = [
   ...packages.back,
   ...packages.both,
 ] as const;
-const autoTemplateDir = join(__dirname, "../dist/content/auto");
 
 type Extends<T, U extends T> = U;
 type PossiblePromise<T> = T | Promise<T>;
@@ -80,6 +79,8 @@ const extendEsLintConfig = (
 export default async (dir: string, options: Options): Promise<string[]> => {
   const { ui, testing } = options;
   const { confirm, inputEnd, inputPackages, onCommandError } = ui;
+  const runCommandShort = (command: string) =>
+    runCommand(command, dir, onCommandError);
   const end = await inputEnd();
   const packageChoices =
     end === "both" ? allPackages : [...packages.both, ...packages[end]];
@@ -88,14 +89,12 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
   !packageJsonExists &&
     (await confirm("Would you like to create a package.json file?", true)) &&
-    (await runCommand("npm init", dir));
+    (await runCommandShort("npm init"));
+  if (requestedPackages.includes("TypeScript")) {
+    await runCommandShort("npx tsc --init");
+  }
   const devDependencies: string[] = [];
-  const commands: string[] = [];
   const scripts: Record<string, string> = {};
-  const tsConfigPath = join(dir, "tsconfig.json");
-  let tsConfig = readFileSync(
-    join(autoTemplateDir, "tsconfig.json"),
-  ).toString();
   const indexJsPath = join(dir, "src/index.js");
   let indexJs = "";
   for (const pkg of requestedPackages) {
@@ -112,9 +111,12 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       );
       scripts.docs =
         "npm run build && api-extractor run --local && api-documenter markdown --input-folder temp --output-folder docs/md";
-      tsConfig = tsConfig
+      const tsConfigPath = join(dir, "tsconfig.json");
+      const tsConfig = readFileSync(tsConfigPath)
+        .toString()
         .replace('// "declaration":', '"declaration":')
         .replace('// "declarationMap":', '"declarationMap":');
+      write(tsConfigPath, tsConfig);
       // const apiExtConfigPath = join(dir, "api-extractor.json");
       // const apiExtConfigBasePath = join(autoTemplateDir, "api-extractor.json");
       // const apiExtConfigBase = readFileSync(apiExtConfigBasePath).toString();
@@ -123,7 +125,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       //   '"mainEntryPointFilePath": "',
       // );
       // write(apiExtConfigPath, apiExtConfig);
-      commands.push("npx @microsoft/api-extractor init");
+      await runCommandShort("npx @microsoft/api-extractor init");
     } else if (pkg === "Dotenv") {
       devDependencies.push("dotenv");
       write(join(dir, ".env"), "");
@@ -181,11 +183,11 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         devDependencies.push("ts-jest", "@types/jest");
         const indexTestTsPath = join(dir, "src/index.test.ts");
         write(indexTestTsPath, "");
-        commands.push("npx ts-jest config:init");
+        await runCommandShort("npx ts-jest config:init");
       } else {
         const indexTestJsPath = join(dir, "src/index.test.js");
         write(indexTestJsPath, "");
-        commands.push("npx jest --init");
+        await runCommandShort("npx jest --init");
       }
     } else if (pkg === "Prettier") {
       if (!requestedPackages.includes("ESLint")) {
@@ -209,7 +211,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         const tsSveltePath = join(dir, "scripts/tsSvelte.js");
         const tsSvelte = await getTemplateFile("scripts/tsSvelte.js");
         devDependencies.push("@tsconfig/svelte");
-        commands.push("node scripts/tsSvelte.js");
+        await runCommandShort("node scripts/tsSvelte.js");
         write(tsSveltePath, tsSvelte);
       } else {
         devDependencies.push(
@@ -279,7 +281,9 @@ export default async (dir: string, options: Options): Promise<string[]> => {
           write(indexCssPath, indexCss);
         }
       } else {
-        commands.push("npx tailwindcss-cli@latest build -o src/tailwind.css");
+        await runCommandShort(
+          "npx tailwindcss-cli@latest build -o src/tailwind.css",
+        );
       }
     } else if (pkg === "TypeScript") {
       devDependencies.push("typescript");
@@ -288,9 +292,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       write(tsPath, "");
     }
   }
-  if (requestedPackages.includes("TypeScript")) {
-    write(tsConfigPath, tsConfig);
-  } else {
+  if (!requestedPackages.includes("TypeScript")) {
     write(indexJsPath, indexJs);
   }
   let buildScript = "";
@@ -316,13 +318,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const shouldInstall =
     !testing &&
     (await confirm("Would you like to install NPM dependencies now?", true));
-  shouldInstall && commands.push(`npm i -D ${finalDevDependencies.join(" ")}`);
-  for (const command of commands) {
-    try {
-      await runCommand(command, dir);
-    } catch (err) {
-      await onCommandError(command, err);
-    }
-  }
+  shouldInstall &&
+    (await runCommandShort(`npm i -D ${finalDevDependencies.join(" ")}`));
   return finalDevDependencies;
 };

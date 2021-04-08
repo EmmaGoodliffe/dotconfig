@@ -3,6 +3,7 @@ import { spawn } from "child_process";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import fetch from "node-fetch";
 import { dirname } from "path";
+import { Options } from "./index";
 
 const defaultUrl =
   "https://raw.githubusercontent.com/EmmaGoodliffe/default/master/";
@@ -31,7 +32,7 @@ export const write = (path: string, text: string): void => {
 const logTitle = (content: string) =>
   console.log(chalk.blue(`=== ${content} ===`));
 
-export const runCommand = (command: string, dir: string): Promise<void> => {
+const runCommandCore = (command: string, dir: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     logTitle(command);
     const words = command.split(" ");
@@ -41,4 +42,16 @@ export const runCommand = (command: string, dir: string): Promise<void> => {
     output.on("close", () => resolve());
     output.on("error", err => reject(err));
   });
+};
+
+export const runCommand = async (
+  command: string,
+  dir: string,
+  onCommandError: Options["ui"]["onCommandError"],
+): Promise<void> => {
+  try {
+    await runCommandCore(command, dir);
+  } catch (err) {
+    await onCommandError(command, err);
+  }
 };
