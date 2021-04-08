@@ -4,26 +4,23 @@ import esLintConfigBase from "./content/.eslintrc.json";
 import { getTemplateFile, runCommand, write } from "./io";
 import { sortJson, unique } from "./util";
 
-const packages = [
-  "API Extractor",
-  "Dotenv",
-  "ESLint",
-  "Git",
-  "GitHub",
-  "Jest",
-  "Prettier",
-  "SCSS",
-  "Svelte",
-  "Tailwind",
-  "TypeScript",
+const packages = {
+  front: ["SCSS", "Svelte", "Tailwind"],
+  back: ["API Extractor"],
+  both: ["Dotenv", "ESLint", "Git", "GitHub", "Jest", "Prettier", "TypeScript"],
+} as const;
+const allPackages = [
+  ...packages.front,
+  ...packages.back,
+  ...packages.both,
 ] as const;
 const autoTemplateDir = join(__dirname, "../dist/content/auto");
 
 type Extends<T, U extends T> = U;
-
 type PossiblePromise<T> = T | Promise<T>;
 
-type Package = typeof packages[number];
+type Package = typeof allPackages[number];
+type End = keyof typeof packages;
 
 type EsLintConfig = typeof esLintConfigBase & {
   parser?: string;
@@ -32,6 +29,7 @@ type EsLintConfig = typeof esLintConfigBase & {
 
 interface Ui {
   confirm: (label: string, defaultAnswer: boolean) => PossiblePromise<boolean>;
+  inputEnd: () => PossiblePromise<End>;
   inputPackages: (allPackages: Package[]) => PossiblePromise<Package[]>;
   onCommandError: (command: string, err: string) => PossiblePromise<void>;
 }
@@ -41,8 +39,8 @@ export interface Options {
   testing?: boolean;
 }
 
-const isPackage = (pkg: unknown): pkg is Package =>
-  packages.includes(pkg as Package);
+const isPackage = (pkg: string): pkg is Package =>
+  allPackages.includes(pkg as Package);
 
 const getExtensionQuestion = (base: Package, extension: Package) =>
   `Would you like to configure ${base} with ${extension}?`;
@@ -81,8 +79,11 @@ const extendEsLintConfig = (
 
 export default async (dir: string, options: Options): Promise<string[]> => {
   const { ui, testing } = options;
-  const { confirm, inputPackages, onCommandError } = ui;
-  const requestedPackages = await inputPackages([...packages]);
+  const { confirm, inputEnd, inputPackages, onCommandError } = ui;
+  const end = await inputEnd();
+  const packageChoices =
+    end === "both" ? allPackages : [...packages.both, ...packages[end]];
+  const requestedPackages = await inputPackages([...packageChoices]);
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
   !packageJsonExists &&
@@ -196,7 +197,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
     } else if (pkg === "SCSS") {
       devDependencies.push("sass");
       if (!requestedPackages.includes("Tailwind")) {
-        scripts["build:scss"] = "sass src/index.scss dist/index.css";
+        scripts["build:scss"] = "sass src/index.scss public/index.css";
       }
     } else if (pkg === "Svelte") {
       scripts["build:svelte"] = "rollup -c";
@@ -267,13 +268,13 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         ].join("\n");
         if (requestedPackages.includes("SCSS")) {
           scripts["build:scss"] =
-            "sass src/index.scss src/index.css && tailwindcss-cli build src/index.css -o dist/index.css";
+            "sass src/index.scss temp/index.css && tailwindcss-cli build temp/index.css -o public/index.css";
           const indexScssPath = join(dir, "src/index.scss");
           const indexScss = indexCss;
           write(indexScssPath, indexScss);
         } else {
           scripts["build:css"] =
-            "tailwindcss-cli build src/index.css -o dist/index.css";
+            "tailwindcss-cli build src/index.css -o public/index.css";
           const indexCssPath = join(dir, "src/index.css");
           write(indexCssPath, indexCss);
         }

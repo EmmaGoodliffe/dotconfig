@@ -1,34 +1,16 @@
 import chalk from "chalk";
 import { config } from "dotenv";
 import { existsSync, mkdirSync } from "fs";
-import { checkboxes, confirm } from "input";
 import { dirname, join } from "path";
 import { argv } from "yargs";
 import helpDocs from "./help";
-import core, { Options } from "./index";
+import ui from "./ui";
+import core from "./index";
 
 config();
 
 const version = process.env.VERSION as string;
 const helpTip = `Run ${chalk.blue("dotconfig --help")} for documentation`;
-export const ui: Ui = {
-  confirm(label, defaultAnswer) {
-    return confirm(label, { default: defaultAnswer });
-  },
-  inputPackages(allPackages) {
-    return checkboxes(
-      "Which packages would you like to configure?",
-      allPackages.map(pkg => ({ name: pkg })),
-    );
-  },
-  onCommandError(command, err) {
-    throw new Error(
-      `Command error running ${chalk.blue(command)}: ${chalk.red(err)}`,
-    );
-  },
-};
-
-type Ui = Options["ui"];
 
 const getExpRecError = (
   description: string,

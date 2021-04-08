@@ -1,4 +1,4 @@
-export default (version: string) => `
+export default (version: string): string => `
 Version: ${version}
 
 Syntax: dotconfig <path to directory> [<options>]

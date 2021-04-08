@@ -40,29 +40,44 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ui = void 0;
 var chalk_1 = __importDefault(require("chalk"));
 var dotenv_1 = require("dotenv");
 var fs_1 = require("fs");
-var input_1 = require("input");
+// import { checkboxes, confirm, select } from "input";
 var path_1 = require("path");
 var yargs_1 = require("yargs");
 var help_1 = __importDefault(require("./help"));
+var ui_1 = __importDefault(require("./ui"));
 var index_1 = __importDefault(require("./index"));
 dotenv_1.config();
 var version = process.env.VERSION;
 var helpTip = "Run " + chalk_1.default.blue("dotconfig --help") + " for documentation";
-exports.ui = {
-    confirm: function (label, defaultAnswer) {
-        return input_1.confirm(label, { default: defaultAnswer });
-    },
-    inputPackages: function (allPackages) {
-        return input_1.checkboxes("Which packages would you like to configure?", allPackages.map(function (pkg) { return ({ name: pkg }); }));
-    },
-    onCommandError: function (command, err) {
-        throw new Error("Command error running " + chalk_1.default.blue(command) + ": " + chalk_1.default.red(err));
-    },
-};
+// const ui: Ui = {
+//   confirm(label, defaultAnswer) {
+//     return confirm(label, { default: defaultAnswer });
+//   },
+//   inputEnd() {
+//     return select("Is your project front-end or back-end?", [
+//       ...([
+//         { name: "Front-end", value: "front" },
+//         { name: "Back-end", value: "back" },
+//         { name: "Full-stack (both)", value: "both" },
+//       ] as const),
+//     ]);
+//   },
+//   inputPackages(allPackages) {
+//     return checkboxes(
+//       "Which packages would you like to configure?",
+//       allPackages.map(pkg => ({ name: pkg })),
+//     );
+//   },
+//   onCommandError(command, err) {
+//     throw new Error(
+//       `Command error running ${chalk.blue(command)}: ${chalk.red(err)}`,
+//     );
+//   },
+// };
+// type Ui = Options["ui"];
 var getExpRecError = function (description, expected, received) { return "Expected " + description + " to be " + expected + "; received " + received; };
 var getArgNumError = function (argNumReceived) {
     return getExpRecError("number of dotconfig arguments", "1", "" + argNumReceived);
@@ -91,7 +106,7 @@ var run = function () { return __awaiter(void 0, void 0, void 0, function () {
                 }
                 dir = path_1.join(path_1.dirname(""), "" + yargs_1.argv._[0]);
                 !fs_1.existsSync(dir) && fs_1.mkdirSync(dir, { recursive: true });
-                return [4 /*yield*/, index_1.default(dir, { ui: exports.ui })];
+                return [4 /*yield*/, index_1.default(dir, { ui: ui_1.default })];
             case 1:
                 _a.sent();
                 return [2 /*return*/];

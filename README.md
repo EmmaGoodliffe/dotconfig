@@ -5,15 +5,19 @@ Generate config files and boilerplate with ease
 # To do
 
 - Separate front- and back-end
+- Create an `index.html` file for front-ends
+- Ensure all `build:` scripts have equivalent `dev:` scripts (e.g. with `npm-watch`)
+- Change `dist/content/auto` to running some commands immediately
+
+## Jest
+
+- Move tests to `test`
 
 ## Svelte
 
-- Rename `src/main.ts` to `src/index.ts`
 - Create `src/App.svelte`
 - Create `start` script
-- Change `dist` to `public` for Tailwind output
-- Use `npm-watch`
 
 ## Tailwind
 
-- Remove SCSS integration
+- Remove SCSS integration?
