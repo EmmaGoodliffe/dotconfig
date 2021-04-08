@@ -17,6 +17,7 @@ const packages = [
   "Tailwind",
   "TypeScript",
 ] as const;
+const autoTemplateDir = join(__dirname, "../dist/content/auto");
 
 type Extends<T, U extends T> = U;
 
@@ -26,28 +27,27 @@ type Package = typeof packages[number];
 
 type EsLintConfig = typeof esLintConfigBase & {
   parser?: string;
-  rules?: { [key: string]: unknown };
+  rules?: Record<string, unknown>;
 };
 
 interface Ui {
   confirm: (label: string, defaultAnswer: boolean) => PossiblePromise<boolean>;
   inputPackages: (allPackages: Package[]) => PossiblePromise<Package[]>;
-  onCommandError: (error: string) => PossiblePromise<void>;
-  onPackageComplete?: (pkg: Package) => PossiblePromise<void>;
+  onCommandError: (command: string, err: string) => PossiblePromise<void>;
 }
 
-interface Options {
+export interface Options {
   ui: Ui;
-  autoInstall?: boolean;
+  testing?: boolean;
 }
 
 const isPackage = (pkg: unknown): pkg is Package =>
   packages.includes(pkg as Package);
 
 const getExtensionQuestion = (base: Package, extension: Package) =>
-  `Do you want to configure ${base} with ${extension}?`;
+  `Would you like to configure ${base} with ${extension}?`;
 
-const getEsLintConfig = (
+const extendEsLintConfig = (
   base: EsLintConfig,
   extension: Extends<Package, "Prettier" | "TypeScript">,
 ) => {
@@ -80,20 +80,20 @@ const getEsLintConfig = (
 };
 
 export default async (dir: string, options: Options): Promise<string[]> => {
-  const { ui, autoInstall } = options;
-  const { confirm, inputPackages, onPackageComplete, onCommandError } = ui;
+  const { ui, testing } = options;
+  const { confirm, inputPackages, onCommandError } = ui;
   const requestedPackages = await inputPackages([...packages]);
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
-  if (!packageJsonExists) {
-    throw new Error(`Expected ${packageJsonPath} to exist`);
-  }
+  !packageJsonExists &&
+    (await confirm("Would you like to create a package.json file?", true)) &&
+    (await runCommand("npm init", dir));
   const devDependencies: string[] = [];
   const commands: string[] = [];
   const scripts: Record<string, string> = {};
   const tsConfigPath = join(dir, "tsconfig.json");
   let tsConfig = readFileSync(
-    join(__dirname, "content/auto/tsconfig.json"),
+    join(autoTemplateDir, "tsconfig.json"),
   ).toString();
   const indexJsPath = join(dir, "src/index.js");
   let indexJs = "";
@@ -112,25 +112,23 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       scripts.docs =
         "npm run build && api-extractor run --local && api-documenter markdown --input-folder temp --output-folder docs/md";
       tsConfig = tsConfig
-        .replace('// "declaration": true,', '"declaration": true,   ')
-        .replace('// "declarationMap": true,', '"declarationMap": true,   ');
-      const apiExtConfigPath = join(dir, "api-extractor.json");
-      const apiExtConfigBasePath = join(
-        __dirname,
-        "content/auto/api-extractor.json",
-      );
-      const apiExtConfigBase = readFileSync(apiExtConfigBasePath).toString();
-      const apiExtConfig = apiExtConfigBase.replace(
-        '"mainEntryPointFilePath": "<projectFolder>/',
-        '"mainEntryPointFilePath": "',
-      );
-      write(apiExtConfigPath, apiExtConfig);
+        .replace('// "declaration":', '"declaration":')
+        .replace('// "declarationMap":', '"declarationMap":');
+      // const apiExtConfigPath = join(dir, "api-extractor.json");
+      // const apiExtConfigBasePath = join(autoTemplateDir, "api-extractor.json");
+      // const apiExtConfigBase = readFileSync(apiExtConfigBasePath).toString();
+      // const apiExtConfig = apiExtConfigBase.replace(
+      //   '"mainEntryPointFilePath": "<projectFolder>/',
+      //   '"mainEntryPointFilePath": "',
+      // );
+      // write(apiExtConfigPath, apiExtConfig);
+      commands.push("npx @microsoft/api-extractor init");
     } else if (pkg === "Dotenv") {
       devDependencies.push("dotenv");
       write(join(dir, ".env"), "");
     } else if (pkg === "ESLint") {
       devDependencies.push("eslint", "eslint-plugin-import");
-      scripts.lint = 'eslint "." --fix && prettier "." --write';
+      scripts.lint = 'eslint "." --fix';
       const prettierQuestion = getExtensionQuestion(pkg, "Prettier");
       const usePrettier =
         requestedPackages.includes("Prettier") &&
@@ -142,11 +140,12 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       const esLintConfigPath = join(dir, ".eslintrc.json");
       let esLintConfig: EsLintConfig = { ...esLintConfigBase };
       if (usePrettier) {
-        esLintConfig = getEsLintConfig(esLintConfig, "Prettier");
+        scripts.lint += ' && prettier "." --write';
+        esLintConfig = extendEsLintConfig(esLintConfig, "Prettier");
         devDependencies.push("prettier", "eslint-plugin-prettier");
       }
       if (useTs) {
-        esLintConfig = getEsLintConfig(esLintConfig, "TypeScript");
+        esLintConfig = extendEsLintConfig(esLintConfig, "TypeScript");
         devDependencies.push(
           "@typescript-eslint/eslint-plugin",
           "@typescript-eslint/parser",
@@ -208,6 +207,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
       if (requestedPackages.includes("TypeScript")) {
         const tsSveltePath = join(dir, "scripts/tsSvelte.js");
         const tsSvelte = await getTemplateFile("scripts/tsSvelte.js");
+        devDependencies.push("@tsconfig/svelte");
         commands.push("node scripts/tsSvelte.js");
         write(tsSveltePath, tsSvelte);
       } else {
@@ -281,12 +281,11 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         commands.push("npx tailwindcss-cli@latest build -o src/tailwind.css");
       }
     } else if (pkg === "TypeScript") {
-      devDependencies.push("tsc");
+      devDependencies.push("typescript");
       scripts["build:ts"] = "tsc";
       const tsPath = join(dir, "src/index.ts");
       write(tsPath, "");
     }
-    onPackageComplete && (await onPackageComplete(pkg));
   }
   if (requestedPackages.includes("TypeScript")) {
     write(tsConfigPath, tsConfig);
@@ -314,13 +313,14 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   write(packageJsonPath, JSON.stringify(packageJson, null, 2));
   const finalDevDependencies = unique(devDependencies).sort();
   const shouldInstall =
-    (autoInstall === false ? false : true) && devDependencies.length;
+    !testing &&
+    (await confirm("Would you like to install NPM dependencies now?", true));
   shouldInstall && commands.push(`npm i -D ${finalDevDependencies.join(" ")}`);
   for (const command of commands) {
     try {
       await runCommand(command, dir);
     } catch (err) {
-      await onCommandError(err);
+      await onCommandError(command, err);
     }
   }
   return finalDevDependencies;

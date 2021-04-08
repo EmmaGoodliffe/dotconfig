@@ -1,34 +1,17 @@
 import { spawnSync } from "child_process";
-import { mkdirSync, readdirSync, rmdirSync } from "fs";
+import { mkdirSync, readdirSync, readFileSync, rmdirSync } from "fs";
 import { join } from "path";
 import core from "../src";
 
-/*
-API Extractor - TypeScript
-Dotenv -
-ESLint - Prettier TypeScript
-Git -
-GitHub -
-Jest - TypeScript
-Prettier -
-Svelte - SCSS Tailwind TypeScript
-Tailwind - SCSS
-*/
-
-const expectations = {
-  "API Extractor": {
-    files: ["api-extractor.json"],
-    patterns: [/@microsoft/],
-  },
-} as const;
-
 const parentDir = join(__dirname, "output");
 
-const reset = () => {
-  for (const childDir of readdirSync(parentDir)) {
-    const path = join(parentDir, childDir);
-    rmdirSync(path, { recursive: true });
-  }
+const ui = {
+  confirm(label: string, defaultAnswer: boolean) {
+    return defaultAnswer;
+  },
+  onCommandError(err: string) {
+    throw new Error(err);
+  },
 };
 
 const getDir = () => {
@@ -38,31 +21,46 @@ const getDir = () => {
   return dir;
 };
 
-const ui = {
-  confirm: (label: string, defaultAnswer: boolean) => defaultAnswer,
-  onCommandError(err: string) {
-    throw new Error(err);
-  },
-};
-
 const getOptions = <T>(packages: T[]) => ({
   ui: { ...ui, inputPackages: () => packages },
-  autoInstall: false,
+  testing: true,
 });
 
 const checkDeps = (deps: string[], patterns: RegExp[]) =>
   patterns.every(pattern => deps.some(dep => pattern.test(dep)));
 
-beforeAll(reset);
+const getFile = (dir: string, path: string) =>
+  readFileSync(join(dir, path)).toString();
 
-test("API Extractor", async () => {
-  expect.assertions(2);
-  const dir = getDir();
-  await core(dir, getOptions(["API Extractor"])).catch(err =>
-    expect(err.message).toMatch("TypeScript"),
-  );
-  const deps = await core(dir, getOptions(["API Extractor", "TypeScript"]));
-  expect(
-    checkDeps(deps, [...expectations["API Extractor"].patterns]),
-  ).toBeTruthy();
-});
+const getPackageJson = (dir: string) =>
+  JSON.parse(getFile(dir, "package.json")) as {
+    scripts: Record<string, string>;
+  };
+
+const reset = (parentDir: string): void => {
+  for (const childDir of readdirSync(parentDir)) {
+    const path = join(parentDir, childDir);
+    rmdirSync(path, { recursive: true });
+  }
+};
+
+beforeAll(() => reset(parentDir));
+
+test(
+  "API Extractor",
+  async () => {
+    await core(getDir(), getOptions(["API Extractor"])).catch(err =>
+      expect(err.message).toMatch("TypeScript"),
+    );
+    const dir = getDir();
+    const deps = await core(dir, getOptions(["API Extractor", "TypeScript"]));
+    const packageJson = getPackageJson(dir);
+    expect(checkDeps(deps, [/@microsoft/])).toBeTruthy();
+    expect(packageJson.scripts.docs).toMatch("api-extractor");
+    expect(getFile(dir, "tsconfig.json")).not.toMatch('// "declaration"');
+    expect(getFile(dir, "tsconfig.json")).not.toMatch(
+      '"mainEntryPointFilePath": "<projectFolder>/',
+    );
+  },
+  2 * 60 * 1000,
+);

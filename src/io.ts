@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { spawn } from "child_process";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import fetch from "node-fetch";
@@ -10,7 +11,14 @@ export const getTemplateFile = async (file: string): Promise<string> => {
   const url = defaultUrl + file;
   const response = await fetch(url);
   const text = await response.text();
-  return text;
+  if (response.ok) {
+    return text;
+  }
+  throw new Error(
+    `Template file ${chalk.blue(url)} failed (${chalk.red(
+      response.status,
+    )}): ${chalk.red(text)}`,
+  );
 };
 
 export const write = (path: string, text: string): void => {
@@ -20,8 +28,12 @@ export const write = (path: string, text: string): void => {
   writeFileSync(path, text);
 };
 
+const logTitle = (content: string) =>
+  console.log(chalk.blue(`=== ${content} ===`));
+
 export const runCommand = (command: string, dir: string): Promise<void> => {
   return new Promise((resolve, reject) => {
+    logTitle(command);
     const words = command.split(" ");
     const main = words[0];
     const args = words.slice(1);
