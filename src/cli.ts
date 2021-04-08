@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { config } from "dotenv";
 import { existsSync, mkdirSync } from "fs";
-import { checkboxes, confirm } from "input";
+import { checkboxes, confirm, select } from "input";
 import { dirname, join } from "path";
 import { argv } from "yargs";
 import helpDocs from "./help";
@@ -14,6 +14,15 @@ const helpTip = `Run ${chalk.blue("dotconfig --help")} for documentation`;
 export const ui: Ui = {
   confirm(label, defaultAnswer) {
     return confirm(label, { default: defaultAnswer });
+  },
+  inputEnd() {
+    return select("Is your project front-end or back-end?", [
+      ...([
+        { name: "Front-end", value: "front" },
+        { name: "Back-end", value: "back" },
+        { name: "Full-stack (both)", value: "both" },
+      ] as const),
+    ]);
   },
   inputPackages(allPackages) {
     return checkboxes(

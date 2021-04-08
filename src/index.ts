@@ -196,7 +196,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
     } else if (pkg === "SCSS") {
       devDependencies.push("sass");
       if (!requestedPackages.includes("Tailwind")) {
-        scripts["build:scss"] = "sass src/index.scss dist/index.css";
+        scripts["build:scss"] = "sass src/index.scss public/index.css";
       }
     } else if (pkg === "Svelte") {
       scripts["build:svelte"] = "rollup -c";
@@ -267,13 +267,13 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         ].join("\n");
         if (requestedPackages.includes("SCSS")) {
           scripts["build:scss"] =
-            "sass src/index.scss src/index.css && tailwindcss-cli build src/index.css -o dist/index.css";
+            "sass src/index.scss temp/index.css && tailwindcss-cli build temp/index.css -o public/index.css";
           const indexScssPath = join(dir, "src/index.scss");
           const indexScss = indexCss;
           write(indexScssPath, indexScss);
         } else {
           scripts["build:css"] =
-            "tailwindcss-cli build src/index.css -o dist/index.css";
+            "tailwindcss-cli build src/index.css -o public/index.css";
           const indexCssPath = join(dir, "src/index.css");
           write(indexCssPath, indexCss);
         }
