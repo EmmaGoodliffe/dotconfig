@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import { config } from "dotenv";
 import { existsSync, mkdirSync } from "fs";
-// import { checkboxes, confirm, select } from "input";
 import { dirname, join } from "path";
 import { argv } from "yargs";
 import helpDocs from "./help";
