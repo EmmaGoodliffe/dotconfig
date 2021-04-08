@@ -98,26 +98,32 @@ var extendEsLintConfig = function (base, extension) {
     return base;
 };
 exports.default = (function (dir, options) { return __awaiter(void 0, void 0, void 0, function () {
-    var ui, testing, confirm, inputPackages, onCommandError, requestedPackages, packageJsonPath, packageJsonExists, _a, devDependencies, commands, scripts, tsConfigPath, tsConfig, indexJsPath, indexJs, _i, requestedPackages_1, pkg, prettierQuestion, usePrettier, _b, tsQuestion, useTs, _c, esLintConfigPath, esLintConfig, sortedEsLintConfig, gitIgnoreLines, gitIgnore, gitIgnorePath, files, paths, texts, i, path, text, indexTestTsPath, indexTestJsPath, prettierConfigPath, prettierConfig, rollupConfigPath, rollupConfig, tsSveltePath, tsSvelte, tailwindConfigPath, tailwindConfig, question, indexCss, indexScssPath, indexScss, indexCssPath, tsPath, buildScript, devScript, _d, _e, script, packageJsonBase, allScripts, packageJson, finalDevDependencies, shouldInstall, _f, _g, commands_1, command, err_1;
-    return __generator(this, function (_h) {
-        switch (_h.label) {
+    var ui, testing, confirm, inputPackages, onCommandError, requestedPackages, packageJsonPath, packageJsonExists, _a, _b, devDependencies, commands, scripts, tsConfigPath, tsConfig, indexJsPath, indexJs, _i, requestedPackages_1, pkg, prettierQuestion, usePrettier, _c, tsQuestion, useTs, _d, esLintConfigPath, esLintConfig, sortedEsLintConfig, gitIgnoreLines, gitIgnore, gitIgnorePath, files, paths, texts, i, path, text, indexTestTsPath, indexTestJsPath, prettierConfigPath, prettierConfig, rollupConfigPath, rollupConfig, tsSveltePath, tsSvelte, tailwindConfigPath, tailwindConfig, question, indexCss, indexScssPath, indexScss, indexCssPath, tsPath, buildScript, devScript, _e, _f, script, packageJsonBase, allScripts, packageJson, finalDevDependencies, shouldInstall, _g, _h, commands_1, command, err_1;
+    return __generator(this, function (_j) {
+        switch (_j.label) {
             case 0:
                 ui = options.ui, testing = options.testing;
                 confirm = ui.confirm, inputPackages = ui.inputPackages, onCommandError = ui.onCommandError;
                 return [4 /*yield*/, inputPackages(__spreadArrays(packages))];
             case 1:
-                requestedPackages = _h.sent();
+                requestedPackages = _j.sent();
                 packageJsonPath = path_1.join(dir, "package.json");
                 packageJsonExists = fs_1.existsSync(dir) && fs_1.existsSync(packageJsonPath);
-                _a = !packageJsonExists;
-                if (!_a) return [3 /*break*/, 3];
-                return [4 /*yield*/, confirm("Do you want to create a package.json file?", true)];
+                _b = !packageJsonExists;
+                if (!_b) return [3 /*break*/, 3];
+                return [4 /*yield*/, confirm("Would you like to create a package.json file?", true)];
             case 2:
-                _a = (_h.sent());
-                _h.label = 3;
+                _b = (_j.sent());
+                _j.label = 3;
             case 3:
-                _a &&
-                    io_1.runCommand("npm init", dir);
+                _a = _b;
+                if (!_a) return [3 /*break*/, 5];
+                return [4 /*yield*/, io_1.runCommand("npm init", dir)];
+            case 4:
+                _a = (_j.sent());
+                _j.label = 5;
+            case 5:
+                _a;
                 devDependencies = [];
                 commands = [];
                 scripts = {};
@@ -126,14 +132,14 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 indexJsPath = path_1.join(dir, "src/index.js");
                 indexJs = "";
                 _i = 0, requestedPackages_1 = requestedPackages;
-                _h.label = 4;
-            case 4:
-                if (!(_i < requestedPackages_1.length)) return [3 /*break*/, 27];
+                _j.label = 6;
+            case 6:
+                if (!(_i < requestedPackages_1.length)) return [3 /*break*/, 29];
                 pkg = requestedPackages_1[_i];
                 if (!isPackage(pkg)) {
                     throw new Error("Expected a valid package. Received: " + pkg);
                 }
-                if (!(pkg === "API Extractor")) return [3 /*break*/, 5];
+                if (!(pkg === "API Extractor")) return [3 /*break*/, 7];
                 if (!requestedPackages.includes("TypeScript")) {
                     throw new Error("API Extractor can only be used with TypeScript");
                 }
@@ -152,34 +158,34 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 // );
                 // write(apiExtConfigPath, apiExtConfig);
                 commands.push("npx @microsoft/api-extractor init");
-                return [3 /*break*/, 26];
-            case 5:
-                if (!(pkg === "Dotenv")) return [3 /*break*/, 6];
+                return [3 /*break*/, 28];
+            case 7:
+                if (!(pkg === "Dotenv")) return [3 /*break*/, 8];
                 devDependencies.push("dotenv");
                 io_1.write(path_1.join(dir, ".env"), "");
-                return [3 /*break*/, 26];
-            case 6:
-                if (!(pkg === "ESLint")) return [3 /*break*/, 11];
+                return [3 /*break*/, 28];
+            case 8:
+                if (!(pkg === "ESLint")) return [3 /*break*/, 13];
                 devDependencies.push("eslint", "eslint-plugin-import");
                 scripts.lint = 'eslint "." --fix';
                 prettierQuestion = getExtensionQuestion(pkg, "Prettier");
-                _b = requestedPackages.includes("Prettier");
-                if (!_b) return [3 /*break*/, 8];
-                return [4 /*yield*/, confirm(prettierQuestion, true)];
-            case 7:
-                _b = (_h.sent());
-                _h.label = 8;
-            case 8:
-                usePrettier = _b;
-                tsQuestion = getExtensionQuestion(pkg, "TypeScript");
-                _c = requestedPackages.includes("TypeScript");
+                _c = requestedPackages.includes("Prettier");
                 if (!_c) return [3 /*break*/, 10];
-                return [4 /*yield*/, confirm(tsQuestion, true)];
+                return [4 /*yield*/, confirm(prettierQuestion, true)];
             case 9:
-                _c = (_h.sent());
-                _h.label = 10;
+                _c = (_j.sent());
+                _j.label = 10;
             case 10:
-                useTs = _c;
+                usePrettier = _c;
+                tsQuestion = getExtensionQuestion(pkg, "TypeScript");
+                _d = requestedPackages.includes("TypeScript");
+                if (!_d) return [3 /*break*/, 12];
+                return [4 /*yield*/, confirm(tsQuestion, true)];
+            case 11:
+                _d = (_j.sent());
+                _j.label = 12;
+            case 12:
+                useTs = _d;
                 esLintConfigPath = path_1.join(dir, ".eslintrc.json");
                 esLintConfig = __assign({}, _eslintrc_json_1.default);
                 if (usePrettier) {
@@ -193,17 +199,17 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 }
                 sortedEsLintConfig = util_1.sortJson(esLintConfig);
                 io_1.write(esLintConfigPath, JSON.stringify(sortedEsLintConfig, null, 2));
-                return [3 /*break*/, 26];
-            case 11:
-                if (!(pkg === "Git")) return [3 /*break*/, 12];
+                return [3 /*break*/, 28];
+            case 13:
+                if (!(pkg === "Git")) return [3 /*break*/, 14];
                 gitIgnoreLines = ["node_modules"];
                 requestedPackages.includes("Dotenv") && gitIgnoreLines.push(".env");
                 gitIgnore = gitIgnoreLines.join("\n");
                 gitIgnorePath = path_1.join(dir, ".gitignore");
                 io_1.write(gitIgnorePath, gitIgnore);
-                return [3 /*break*/, 26];
-            case 12:
-                if (!(pkg === "GitHub")) return [3 /*break*/, 14];
+                return [3 /*break*/, 28];
+            case 14:
+                if (!(pkg === "GitHub")) return [3 /*break*/, 16];
                 files = [
                     ".github/ISSUE_TEMPLATE/bug_report.md",
                     ".github/ISSUE_TEMPLATE/feature_request.md",
@@ -212,16 +218,16 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 ];
                 paths = files.map(function (file) { return path_1.join(dir, file); });
                 return [4 /*yield*/, Promise.all(files.map(io_1.getTemplateFile))];
-            case 13:
-                texts = _h.sent();
+            case 15:
+                texts = _j.sent();
                 for (i in paths) {
                     path = paths[i];
                     text = texts[i];
                     io_1.write(path, text);
                 }
-                return [3 /*break*/, 26];
-            case 14:
-                if (!(pkg === "Jest")) return [3 /*break*/, 15];
+                return [3 /*break*/, 28];
+            case 16:
+                if (!(pkg === "Jest")) return [3 /*break*/, 17];
                 devDependencies.push("jest");
                 scripts.test = "jest";
                 if (requestedPackages.includes("TypeScript")) {
@@ -235,44 +241,44 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                     io_1.write(indexTestJsPath, "");
                     commands.push("npx jest --init");
                 }
-                return [3 /*break*/, 26];
-            case 15:
-                if (!(pkg === "Prettier")) return [3 /*break*/, 17];
+                return [3 /*break*/, 28];
+            case 17:
+                if (!(pkg === "Prettier")) return [3 /*break*/, 19];
                 if (!requestedPackages.includes("ESLint")) {
                     scripts.lint = 'prettier "." --write';
                 }
                 prettierConfigPath = path_1.join(dir, ".prettierrc");
                 return [4 /*yield*/, io_1.getTemplateFile(".prettierrc")];
-            case 16:
-                prettierConfig = _h.sent();
+            case 18:
+                prettierConfig = _j.sent();
                 io_1.write(prettierConfigPath, prettierConfig);
-                return [3 /*break*/, 26];
-            case 17:
-                if (!(pkg === "SCSS")) return [3 /*break*/, 18];
+                return [3 /*break*/, 28];
+            case 19:
+                if (!(pkg === "SCSS")) return [3 /*break*/, 20];
                 devDependencies.push("sass");
                 if (!requestedPackages.includes("Tailwind")) {
                     scripts["build:scss"] = "sass src/index.scss dist/index.css";
                 }
-                return [3 /*break*/, 26];
-            case 18:
-                if (!(pkg === "Svelte")) return [3 /*break*/, 23];
+                return [3 /*break*/, 28];
+            case 20:
+                if (!(pkg === "Svelte")) return [3 /*break*/, 25];
                 scripts["build:svelte"] = "rollup -c";
                 scripts["dev:svelte"] = "rollup -c -w";
                 rollupConfigPath = path_1.join(dir, "rollup.config.js");
                 return [4 /*yield*/, io_1.getTemplateFile("rollup.config.js")];
-            case 19:
-                rollupConfig = _h.sent();
+            case 21:
+                rollupConfig = _j.sent();
                 io_1.write(rollupConfigPath, rollupConfig);
-                if (!requestedPackages.includes("TypeScript")) return [3 /*break*/, 21];
+                if (!requestedPackages.includes("TypeScript")) return [3 /*break*/, 23];
                 tsSveltePath = path_1.join(dir, "scripts/tsSvelte.js");
                 return [4 /*yield*/, io_1.getTemplateFile("scripts/tsSvelte.js")];
-            case 20:
-                tsSvelte = _h.sent();
+            case 22:
+                tsSvelte = _j.sent();
                 devDependencies.push("@tsconfig/svelte");
                 commands.push("node scripts/tsSvelte.js");
                 io_1.write(tsSveltePath, tsSvelte);
-                return [3 /*break*/, 22];
-            case 21:
+                return [3 /*break*/, 24];
+            case 23:
                 devDependencies.push("@rollup/plugin-commonjs@^16.0.0", "@rollup/plugin-node-resolve@^10.0.0", "rollup@^2.3.4", "rollup-plugin-css-only@^3.1.0", "rollup-plugin-livereload@^2.0.0", "rollup-plugin-svelte@^7.0.0", "rollup-plugin-terser@^7.0.0", "svelte@^3.0.0");
                 indexJs = [
                     'import App from "./App.svelte";',
@@ -286,10 +292,10 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                     "",
                     "export default app;",
                 ].join("\n");
-                _h.label = 22;
-            case 22: return [3 /*break*/, 26];
-            case 23:
-                if (!(pkg === "Tailwind")) return [3 /*break*/, 25];
+                _j.label = 24;
+            case 24: return [3 /*break*/, 28];
+            case 25:
+                if (!(pkg === "Tailwind")) return [3 /*break*/, 27];
                 devDependencies.push("tailwindcss");
                 tailwindConfigPath = path_1.join(dir, "tailwind.config.js");
                 tailwindConfig = [
@@ -310,8 +316,8 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 io_1.write(tailwindConfigPath, tailwindConfig);
                 question = "Would you like to use custom CSS with Tailwind?";
                 return [4 /*yield*/, confirm(question, true)];
-            case 24:
-                if (_h.sent()) {
+            case 26:
+                if (_j.sent()) {
                     devDependencies.push("tailwindcss-cli");
                     indexCss = [
                         "@tailwind base;",
@@ -339,19 +345,19 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 else {
                     commands.push("npx tailwindcss-cli@latest build -o src/tailwind.css");
                 }
-                return [3 /*break*/, 26];
-            case 25:
+                return [3 /*break*/, 28];
+            case 27:
                 if (pkg === "TypeScript") {
                     devDependencies.push("typescript");
                     scripts["build:ts"] = "tsc";
                     tsPath = path_1.join(dir, "src/index.ts");
                     io_1.write(tsPath, "");
                 }
-                _h.label = 26;
-            case 26:
+                _j.label = 28;
+            case 28:
                 _i++;
-                return [3 /*break*/, 4];
-            case 27:
+                return [3 /*break*/, 6];
+            case 29:
                 if (requestedPackages.includes("TypeScript")) {
                     io_1.write(tsConfigPath, tsConfig);
                 }
@@ -360,8 +366,8 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 }
                 buildScript = "";
                 devScript = "";
-                for (_d = 0, _e = Object.keys(scripts).sort(); _d < _e.length; _d++) {
-                    script = _e[_d];
+                for (_e = 0, _f = Object.keys(scripts).sort(); _e < _f.length; _e++) {
+                    script = _f[_e];
                     if (script.includes("build:")) {
                         buildScript += " && npm run " + script;
                     }
@@ -376,37 +382,37 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 packageJson = __assign(__assign({}, packageJsonBase), { scripts: util_1.sortJson(allScripts) });
                 io_1.write(packageJsonPath, JSON.stringify(packageJson, null, 2));
                 finalDevDependencies = util_1.unique(devDependencies).sort();
-                _f = !testing;
-                if (!_f) return [3 /*break*/, 29];
+                _g = !testing;
+                if (!_g) return [3 /*break*/, 31];
                 return [4 /*yield*/, confirm("Would you like to install NPM dependencies now?", true)];
-            case 28:
-                _f = (_h.sent());
-                _h.label = 29;
-            case 29:
-                shouldInstall = _f;
-                shouldInstall && commands.push("npm i -D " + finalDevDependencies.join(" "));
-                _g = 0, commands_1 = commands;
-                _h.label = 30;
             case 30:
-                if (!(_g < commands_1.length)) return [3 /*break*/, 36];
-                command = commands_1[_g];
-                _h.label = 31;
+                _g = (_j.sent());
+                _j.label = 31;
             case 31:
-                _h.trys.push([31, 33, , 35]);
-                return [4 /*yield*/, io_1.runCommand(command, dir)];
+                shouldInstall = _g;
+                shouldInstall && commands.push("npm i -D " + finalDevDependencies.join(" "));
+                _h = 0, commands_1 = commands;
+                _j.label = 32;
             case 32:
-                _h.sent();
-                return [3 /*break*/, 35];
+                if (!(_h < commands_1.length)) return [3 /*break*/, 38];
+                command = commands_1[_h];
+                _j.label = 33;
             case 33:
-                err_1 = _h.sent();
-                return [4 /*yield*/, onCommandError(command, err_1)];
+                _j.trys.push([33, 35, , 37]);
+                return [4 /*yield*/, io_1.runCommand(command, dir)];
             case 34:
-                _h.sent();
-                return [3 /*break*/, 35];
+                _j.sent();
+                return [3 /*break*/, 37];
             case 35:
-                _g++;
-                return [3 /*break*/, 30];
-            case 36: return [2 /*return*/, finalDevDependencies];
+                err_1 = _j.sent();
+                return [4 /*yield*/, onCommandError(command, err_1)];
+            case 36:
+                _j.sent();
+                return [3 /*break*/, 37];
+            case 37:
+                _h++;
+                return [3 /*break*/, 32];
+            case 38: return [2 /*return*/, finalDevDependencies];
         }
     });
 }); });

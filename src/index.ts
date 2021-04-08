@@ -86,8 +86,8 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
   !packageJsonExists &&
-    (await confirm("Do you want to create a package.json file?", true)) &&
-    runCommand("npm init", dir);
+    (await confirm("Would you like to create a package.json file?", true)) &&
+    (await runCommand("npm init", dir));
   const devDependencies: string[] = [];
   const commands: string[] = [];
   const scripts: Record<string, string> = {};
