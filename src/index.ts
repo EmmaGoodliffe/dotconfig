@@ -81,7 +81,8 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const { ui, testing } = options;
   const { confirm, inputEnd, inputPackages, onCommandError } = ui;
   const end = await inputEnd();
-  const packageChoices = end === "both" ? allPackages : packages[end];
+  const packageChoices =
+    end === "both" ? allPackages : [...packages.both, ...packages[end]];
   const requestedPackages = await inputPackages([...packageChoices]);
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);

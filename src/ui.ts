@@ -15,19 +15,11 @@ const ui: Ui = {
       ] as const),
     ]);
   },
-  async inputPackages(allPackages) {
-    if (allPackages.length === 0) {
-      throw new Error("No compatible packages found");
-    } else if (allPackages.length === 1) {
-      return (await confirm(`Would you like to configure ${allPackages[0]}?`))
-        ? [allPackages[0]]
-        : [];
-    } else {
-      return await checkboxes(
-        "Which packages would you like to configure?",
-        allPackages.map(pkg => ({ name: pkg })),
-      );
-    }
+  inputPackages(allPackages) {
+    return checkboxes(
+      "Which packages would you like to configure?",
+      allPackages.map(pkg => ({ name: pkg })),
+    );
   },
   onCommandError(command, err) {
     throw new Error(
