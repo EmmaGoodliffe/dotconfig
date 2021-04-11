@@ -12,19 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var chalk_1 = __importDefault(require("chalk"));
 var input_1 = require("input");
+var divider = "---";
+var plainDividerCheckboxes = function (label, choices) {
+    var dividerChoices = __spreadArrays(choices);
+    dividerChoices.push({ name: divider, disabled: true });
+    return input_1.checkboxes(label, dividerChoices);
+};
 var ui = {
     confirm: function (label, defaultAnswer) {
         return input_1.confirm(label, { default: defaultAnswer });
     },
     inputEnd: function () {
-        return input_1.select("Is your project front-end or back-end?", __spreadArrays([
+        return input_1.select("Is your project front-end or back-end?", [
             { name: "Front-end", value: "front" },
             { name: "Back-end", value: "back" },
             { name: "Full-stack (both)", value: "both" },
-        ]));
+        ]);
     },
     inputPackages: function (allPackages) {
-        return input_1.checkboxes("Which packages would you like to configure?", allPackages.map(function (pkg) { return ({ name: pkg }); }));
+        return plainDividerCheckboxes("Which packages would you like to configure?", allPackages.map(function (pkg) { return ({ name: pkg, disabled: false }); }));
     },
     onCommandError: function (command, err) {
         throw new Error("Command error running " + chalk_1.default.blue(command) + ": " + chalk_1.default.red(err));

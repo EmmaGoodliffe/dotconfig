@@ -84,7 +84,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const end = await inputEnd();
   const packageChoices =
     end === "both" ? allPackages : [...packages.both, ...packages[end]];
-  const requestedPackages = await inputPackages([...packageChoices]);
+  const requestedPackages = await inputPackages([...packageChoices].sort());
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
   !packageJsonExists &&
@@ -117,15 +117,14 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         .replace('// "declaration":', '"declaration":')
         .replace('// "declarationMap":', '"declarationMap":');
       write(tsConfigPath, tsConfig);
-      // const apiExtConfigPath = join(dir, "api-extractor.json");
-      // const apiExtConfigBasePath = join(autoTemplateDir, "api-extractor.json");
-      // const apiExtConfigBase = readFileSync(apiExtConfigBasePath).toString();
-      // const apiExtConfig = apiExtConfigBase.replace(
-      //   '"mainEntryPointFilePath": "<projectFolder>/',
-      //   '"mainEntryPointFilePath": "',
-      // );
-      // write(apiExtConfigPath, apiExtConfig);
       await runCommandShort("npx @microsoft/api-extractor init");
+      const apiExtConfigPath = join(dir, "api-extractor.json");
+      const apiExtConfigBase = readFileSync(apiExtConfigPath).toString();
+      const apiExtConfig = apiExtConfigBase.replace(
+        '"mainEntryPointFilePath": "<projectFolder>/lib',
+        '"mainEntryPointFilePath": ".',
+      );
+      write(apiExtConfigPath, apiExtConfig);
     } else if (pkg === "Dotenv") {
       devDependencies.push("dotenv");
       write(join(dir, ".env"), "");

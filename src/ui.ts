@@ -2,23 +2,35 @@ import chalk from "chalk";
 import { checkboxes, confirm, select } from "input";
 import { Options } from "./index";
 
+const divider = "---";
+
+const plainDividerCheckboxes = <T extends string>(
+  label: string,
+  choices: { name: T }[],
+) => {
+  const dividerChoices: (
+    | { name: T }
+    | { name: typeof divider; disabled: true }
+  )[] = [...choices];
+  dividerChoices.push({ name: divider, disabled: true });
+  return checkboxes<T, typeof divider, never>(label, dividerChoices);
+};
+
 const ui: Options["ui"] = {
   confirm(label, defaultAnswer) {
     return confirm(label, { default: defaultAnswer });
   },
   inputEnd() {
     return select("Is your project front-end or back-end?", [
-      ...([
-        { name: "Front-end", value: "front" },
-        { name: "Back-end", value: "back" },
-        { name: "Full-stack (both)", value: "both" },
-      ] as const),
+      { name: "Front-end", value: "front" },
+      { name: "Back-end", value: "back" },
+      { name: "Full-stack (both)", value: "both" },
     ]);
   },
   inputPackages(allPackages) {
-    return checkboxes(
+    return plainDividerCheckboxes(
       "Which packages would you like to configure?",
-      allPackages.map(pkg => ({ name: pkg })),
+      allPackages.map(pkg => ({ name: pkg, disabled: false })),
     );
   },
   onCommandError(command, err) {

@@ -5,15 +5,6 @@ import core from "../src";
 
 const parentDir = join(__dirname, "output");
 
-const ui = {
-  confirm(label: string, defaultAnswer: boolean) {
-    return defaultAnswer;
-  },
-  onCommandError(err: string) {
-    throw new Error(err);
-  },
-};
-
 const getDir = () => {
   const dir = join(parentDir, `${Date.now()}`);
   mkdirSync(dir, { recursive: true });
@@ -22,7 +13,14 @@ const getDir = () => {
 };
 
 const getOptions = <T>(packages: T[]) => ({
-  ui: { ...ui, inputPackages: () => packages },
+  ui: {
+    confirm: (label: string, defaultAnswer: boolean) => defaultAnswer,
+    onCommandError(err: string) {
+      throw new Error(err);
+    },
+    inputEnd: (): "both" => "both",
+    inputPackages: () => packages,
+  },
   testing: true,
 });
 

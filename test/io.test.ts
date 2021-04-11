@@ -23,7 +23,7 @@ test("getTemplateFile", async () => {
 });
 
 test("runCommand", async () => {
-  runCommand('echo "hi"', getDir());
+  runCommand('echo "hi"', getDir(), console.error);
 });
 
 test("write", async () => {

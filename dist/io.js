@@ -76,7 +76,7 @@ exports.write = write;
 var logTitle = function (content) {
     return console.log(chalk_1.default.blue("=== " + content + " ==="));
 };
-var runCommand = function (command, dir) {
+var runCommandCore = function (command, dir) {
     return new Promise(function (resolve, reject) {
         logTitle(command);
         var words = command.split(" ");
@@ -87,4 +87,24 @@ var runCommand = function (command, dir) {
         output.on("error", function (err) { return reject(err); });
     });
 };
+var runCommand = function (command, dir, onCommandError) { return __awaiter(void 0, void 0, void 0, function () {
+    var err_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 4]);
+                return [4 /*yield*/, runCommandCore(command, dir)];
+            case 1:
+                _a.sent();
+                return [3 /*break*/, 4];
+            case 2:
+                err_1 = _a.sent();
+                return [4 /*yield*/, onCommandError(command, err_1)];
+            case 3:
+                _a.sent();
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
 exports.runCommand = runCommand;

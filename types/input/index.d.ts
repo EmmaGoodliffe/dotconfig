@@ -1,31 +1,29 @@
 type Validate<T> = (answer: T) => boolean;
 
+type Cb<T> = T & { checked?: boolean };
+
 interface Choice<N extends string> {
   name: N;
-  disabled?: boolean;
+  disabled?: false;
 }
 
-interface ChoiceWithValue<N, V> extends CbChoice<N> {
+interface ChoiceWithValue<N, V> extends Choice<N> {
   value?: V;
 }
 
-interface CbChoice<N> extends Choice<N> {
-  checked?: boolean;
-}
-
-interface CbChoiceWithValue<N, V> extends CbChoice<N> {
-  value?: V;
+interface DisabledChoice<N, V> extends ChoiceWithValue<N, V> {
+  disabled: true;
 }
 
 declare module "input" {
-  function checkboxes<N>(
+  function checkboxes<N, DN, DV>(
     label: string,
-    choices: CbChoice<N>[],
+    choices: (Cb<Choice<N>> | Cb<DisabledChoice<DN, DV>>)[],
     options?: { validate?: Validate<N[]> },
   ): Promise<N[]>;
-  function checkboxes<N, V>(
+  function checkboxes<N, DN, DV, V>(
     label: string,
-    choices: CbChoiceWithValue<N, V>[],
+    choices: (Cb<ChoiceWithValue<N, V>> | Cb<DisabledChoice<DN, DV>>)[],
     options?: { validate?: Validate<V[]> },
   ): Promise<V[]>;
   function confirm(

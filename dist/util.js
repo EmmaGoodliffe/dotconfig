@@ -8,19 +8,11 @@ var isObject = function (obj) {
 };
 var sortJson = function (object) {
     if (object instanceof Array) {
-        // for (const i in object) {
-        //   object[i] = sortJson(object[i]);
-        // }
-        // return object;
         return object.map(exports.sortJson);
     }
     else if (isObject(object)) {
         var keys = Object.keys(object).sort();
         var newObject = {};
-        // for (const i in keys) {
-        //   const key = keys[i];
-        //   newObject[key] = sortJson(object[key]);
-        // }
         for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
             var key = keys_1[_i];
             newObject[key] = exports.sortJson(object[key]);
