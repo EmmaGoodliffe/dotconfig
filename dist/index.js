@@ -91,14 +91,14 @@ var extendEsLintConfig = function (base, extension) {
     return base;
 };
 exports.default = (function (dir, options) { return __awaiter(void 0, void 0, void 0, function () {
-    var ui, testing, confirm, inputEnd, inputPackages, onCommandError, runLocalCommand, end, packageChoices, requestedPackages, packageJsonPath, packageJsonExists, _a, _b, devDependencies, scripts, indexJsPath, indexJs, _i, requestedPackages_1, pkg, tsConfigPath, tsConfig, apiExtConfigPath, apiExtConfigBase, apiExtConfig, prettierQuestion, usePrettier, _c, tsQuestion, useTs, _d, esLintConfigPath, esLintConfig, sortedEsLintConfig, gitIgnoreLines, gitIgnore, gitIgnorePath, files, paths, texts, i, path, text, indexTestTsPath, indexTestJsPath, prettierConfigPath, prettierConfig, rollupConfigPath, rollupConfig, tsSveltePath, tsSvelte, tailwindConfigPath, tailwindConfig, question, indexCss, indexScssPath, indexScss, indexCssPath, tsPath, buildScript, devScript, _e, _f, script, packageJsonBase, allScripts, packageJson, finalDevDependencies, shouldInstall, _g;
+    var ui, testing, confirm, inputEnd, inputPackages, log, onCommandError, runLocalCommand, end, packageChoices, requestedPackages, packageJsonPath, packageJsonExists, _a, _b, devDependencies, scripts, indexJsPath, indexJs, _i, requestedPackages_1, pkg, tsConfigPath, tsConfig, apiExtConfigPath, apiExtConfigBase, apiExtConfig, prettierQuestion, usePrettier, _c, tsQuestion, useTs, _d, esLintConfigPath, esLintConfig, sortedEsLintConfig, gitIgnoreLines, gitIgnore, gitIgnorePath, files, paths, texts, i, path, text, indexTestTsPath, indexTestJsPath, prettierConfigPath, prettierConfig, rollupConfigPath, rollupConfig, tsSveltePath, tsSvelte, tailwindConfigPath, tailwindConfig, question, indexCss, indexScssPath, indexScss, indexCssPath, tsPath, buildScript, devScript, _e, _f, script, packageJsonBase, allScripts, packageJson, finalDevDependencies, shouldInstall, _g;
     return __generator(this, function (_h) {
         switch (_h.label) {
             case 0:
                 ui = options.ui, testing = options.testing;
-                confirm = ui.confirm, inputEnd = ui.inputEnd, inputPackages = ui.inputPackages, onCommandError = ui.onCommandError;
+                confirm = ui.confirm, inputEnd = ui.inputEnd, inputPackages = ui.inputPackages, log = ui.log, onCommandError = ui.onCommandError;
                 runLocalCommand = function (command) {
-                    return io_1.runWrappedCommand(command, dir, onCommandError);
+                    return io_1.runWrappedCommand(command, dir, log, onCommandError);
                 };
                 return [4 /*yield*/, inputEnd()];
             case 1:
@@ -402,11 +402,12 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 return [4 /*yield*/, runLocalCommand("npm i -D " + finalDevDependencies.join(" "))];
             case 44:
                 _h.sent();
-                return [3 /*break*/, 46];
-            case 45:
-                io_1.info("You can install your dependencies at any time with " + chalk_1.default.blue("dotconfig <path> -i"));
-                _h.label = 46;
-            case 46: return [2 /*return*/, finalDevDependencies];
+                return [3 /*break*/, 47];
+            case 45: return [4 /*yield*/, io_1.info("You can install your dependencies at any time with " + chalk_1.default.blue("dotconfig <path> -i"), log)];
+            case 46:
+                _h.sent();
+                _h.label = 47;
+            case 47: return [2 /*return*/, finalDevDependencies];
         }
     });
 }); });

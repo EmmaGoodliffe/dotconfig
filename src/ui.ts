@@ -33,6 +33,7 @@ const ui: Options["ui"] = {
       allPackages.map(pkg => ({ name: pkg, disabled: false })),
     );
   },
+  log: console.log,
   onCommandError(command, err) {
     throw new Error(
       `Command error running ${chalk.blue(command)}: ${chalk.red(err)}`,

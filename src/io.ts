@@ -29,15 +29,16 @@ export const write = (path: string, text: string) => {
   writeFileSync(path, text);
 };
 
-const title = (content: string) =>
-  console.log(chalk.blue(`=== ${content} ===`));
+export const info = (content: string, log: Options["ui"]["log"]) =>
+  log(`${chalk.blue("i")} ${content}`);
 
-export const info = (content: string) =>
-  console.log(`${chalk.blue("i")} ${content}`);
-
-const runCommand = (command: string, dir: string): Promise<void> => {
+const runCommand = async (
+  command: string,
+  dir: string,
+  log: Options["ui"]["log"],
+): Promise<void> => {
+  await log(chalk.blue(`=== ${command} ===`));
   return new Promise((resolve, reject) => {
-    title(command);
     const words = command.split(" ");
     const main = words[0];
     const args = words.slice(1);
@@ -50,10 +51,11 @@ const runCommand = (command: string, dir: string): Promise<void> => {
 export const runWrappedCommand = async (
   command: string,
   dir: string,
+  log: Options["ui"]["log"],
   onCommandError: Options["ui"]["onCommandError"],
 ) => {
   try {
-    await runCommand(command, dir);
+    await runCommand(command, dir, log);
   } catch (err) {
     await onCommandError(command, err);
   }

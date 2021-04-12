@@ -32,6 +32,7 @@ var ui = {
     inputPackages: function (allPackages) {
         return plainDividerCheckboxes("Which packages would you like to configure?", allPackages.map(function (pkg) { return ({ name: pkg, disabled: false }); }));
     },
+    log: console.log,
     onCommandError: function (command, err) {
         throw new Error("Command error running " + chalk_1.default.blue(command) + ": " + chalk_1.default.red(err));
     },

@@ -73,31 +73,34 @@ var write = function (path, text) {
     fs_1.writeFileSync(path, text);
 };
 exports.write = write;
-var title = function (content) {
-    return console.log(chalk_1.default.blue("=== " + content + " ==="));
-};
-var info = function (content) {
-    return console.log(chalk_1.default.blue("i") + " " + content);
+var info = function (content, log) {
+    return log(chalk_1.default.blue("i") + " " + content);
 };
 exports.info = info;
-var runCommand = function (command, dir) {
-    return new Promise(function (resolve, reject) {
-        title(command);
-        var words = command.split(" ");
-        var main = words[0];
-        var args = words.slice(1);
-        var output = child_process_1.spawn(main, args, { cwd: dir, stdio: "inherit" });
-        output.on("close", function () { return resolve(); });
-        output.on("error", function (err) { return reject(err); });
+var runCommand = function (command, dir, log) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, log(chalk_1.default.blue("=== " + command + " ==="))];
+            case 1:
+                _a.sent();
+                return [2 /*return*/, new Promise(function (resolve, reject) {
+                        var words = command.split(" ");
+                        var main = words[0];
+                        var args = words.slice(1);
+                        var output = child_process_1.spawn(main, args, { cwd: dir, stdio: "inherit" });
+                        output.on("close", function () { return resolve(); });
+                        output.on("error", function (err) { return reject(err); });
+                    })];
+        }
     });
-};
-var runWrappedCommand = function (command, dir, onCommandError) { return __awaiter(void 0, void 0, void 0, function () {
+}); };
+var runWrappedCommand = function (command, dir, log, onCommandError) { return __awaiter(void 0, void 0, void 0, function () {
     var err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 4]);
-                return [4 /*yield*/, runCommand(command, dir)];
+                return [4 /*yield*/, runCommand(command, dir, log)];
             case 1:
                 _a.sent();
                 return [3 /*break*/, 4];

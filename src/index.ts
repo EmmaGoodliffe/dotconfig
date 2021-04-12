@@ -31,6 +31,7 @@ interface Ui {
   confirm: (label: string, defaultAnswer: boolean) => PossiblePromise<boolean>;
   inputEnd: () => PossiblePromise<End>;
   inputPackages: (allPackages: Package[]) => PossiblePromise<Package[]>;
+  log: (message: string) => PossiblePromise<void>;
   onCommandError: (command: string, err: string) => PossiblePromise<void>;
 }
 
@@ -79,9 +80,9 @@ const extendEsLintConfig = (
 
 export default async (dir: string, options: Options) => {
   const { ui, testing } = options;
-  const { confirm, inputEnd, inputPackages, onCommandError } = ui;
+  const { confirm, inputEnd, inputPackages, log, onCommandError } = ui;
   const runLocalCommand = (command: string) =>
-    runWrappedCommand(command, dir, onCommandError);
+    runWrappedCommand(command, dir, log, onCommandError);
   const end = await inputEnd();
   const packageChoices =
     end === "both" ? allPackages : [...packages.both, ...packages[end]];
@@ -321,10 +322,11 @@ export default async (dir: string, options: Options) => {
   if (shouldInstall) {
     await runLocalCommand(`npm i -D ${finalDevDependencies.join(" ")}`);
   } else {
-    info(
+    await info(
       `You can install your dependencies at any time with ${chalk.blue(
         "dotconfig <path> -i",
       )}`,
+      log,
     );
   }
   return finalDevDependencies;
