@@ -1,49 +1,15 @@
-import chalk from "chalk";
 import { existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
-import { argv, usage } from "yargs";
-// import helpDocs from "./help";
+import yargs, { argv } from "yargs";
 import ui from "./ui";
 import core from "./index";
 
-// const version = process.env.VERSION as string;
-const helpTip = `Run ${chalk.blue("dotconfig --help")} for documentation`;
-
-const getExpRecError = (
-  description: string,
-  expected: string,
-  received: string,
-) => `Expected ${description} to be ${expected}; received ${received}`;
-
-const getArgNumError = (argNumReceived: number) =>
-  getExpRecError("number of dotconfig arguments", "1", `${argNumReceived}`);
-
 const run = async () => {
-  usage("USAGE!");
-  if (argv.helpB) {
-    // console.log(helpDocs(version));
-    console.log("NEW B!");
-    return;
-  }
-  if (argv.vB || argv.versionB) {
-    // console.log(version);
-    console.log("NEW B!");
-    return;
-  }
-  if (argv.bla) {
-    console.log("BLA 2!");
-    return;
-  }
-  if (argv._.length === 0) {
-    const err = getArgNumError(argv._.length);
-    const tip = `If you want to run dotconfig in the current directory, run ${chalk.blue(
-      "dotconfig .",
-    )} or ${helpTip.toLowerCase()}`;
-    throw new Error(`${err}. ${tip}`);
-  } else if (argv._.length > 1) {
-    const err = getArgNumError(argv._.length);
-    throw new Error(`${err}. ${helpTip}`);
-  }
+  yargs.usage("$0 <path> [options]");
+  yargs.demandCommand(1);
+  yargs.alias("v", "version");
+  yargs.example("$0 .", "Configure current directory");
+  yargs.example("$0 ./foo/bar", "Configure child directory");
   const dir = join(dirname(""), `${argv._[0]}`);
   !existsSync(dir) && mkdirSync(dir, { recursive: true });
   await core(dir, { ui });

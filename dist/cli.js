@@ -1,5 +1,24 @@
 #! /usr/bin/env node
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,50 +59,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var chalk_1 = __importDefault(require("chalk"));
-var dotenv_1 = require("dotenv");
 var fs_1 = require("fs");
 var path_1 = require("path");
-var yargs_1 = require("yargs");
-// import helpDocs from "./help";
+var yargs_1 = __importStar(require("yargs"));
 var ui_1 = __importDefault(require("./ui"));
 var index_1 = __importDefault(require("./index"));
-dotenv_1.config();
-// const version = process.env.VERSION as string;
-var helpTip = "Run " + chalk_1.default.blue("dotconfig --help") + " for documentation";
-var getExpRecError = function (description, expected, received) { return "Expected " + description + " to be " + expected + "; received " + received; };
-var getArgNumError = function (argNumReceived) {
-    return getExpRecError("number of dotconfig arguments", "1", "" + argNumReceived);
-};
 var run = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var err, tip, err, dir;
+    var dir;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                yargs_1.usage("USAGE!");
-                if (yargs_1.argv.helpB) {
-                    // console.log(helpDocs(version));
-                    console.log("NEW B!");
-                    return [2 /*return*/];
-                }
-                if (yargs_1.argv.vB || yargs_1.argv.versionB) {
-                    // console.log(version);
-                    console.log("NEW B!");
-                    return [2 /*return*/];
-                }
-                if (yargs_1.argv.bla) {
-                    console.log("BLA 2!");
-                    return [2 /*return*/];
-                }
-                if (yargs_1.argv._.length === 0) {
-                    err = getArgNumError(yargs_1.argv._.length);
-                    tip = "If you want to run dotconfig in the current directory, run " + chalk_1.default.blue("dotconfig .") + " or " + helpTip.toLowerCase();
-                    throw new Error(err + ". " + tip);
-                }
-                else if (yargs_1.argv._.length > 1) {
-                    err = getArgNumError(yargs_1.argv._.length);
-                    throw new Error(err + ". " + helpTip);
-                }
+                yargs_1.default.usage("$0 <path> [options]");
+                yargs_1.default.demandCommand(1);
+                yargs_1.default.alias("v", "version");
+                yargs_1.default.example("$0 .", "Configure current directory");
+                yargs_1.default.example("$0 ./foo/bar", "Configure child directory");
                 dir = path_1.join(path_1.dirname(""), "" + yargs_1.argv._[0]);
                 !fs_1.existsSync(dir) && fs_1.mkdirSync(dir, { recursive: true });
                 return [4 /*yield*/, index_1.default(dir, { ui: ui_1.default })];
