@@ -60,14 +60,19 @@ var run = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (yargs_1.argv.help) {
+                yargs_1.usage("USAGE!");
+                if (yargs_1.argv.helpB) {
                     // console.log(helpDocs(version));
-                    console.log("NEW!");
+                    console.log("NEW B!");
                     return [2 /*return*/];
                 }
-                if (yargs_1.argv.v || yargs_1.argv.version) {
+                if (yargs_1.argv.vB || yargs_1.argv.versionB) {
                     // console.log(version);
-                    console.log("NEW!");
+                    console.log("NEW B!");
+                    return [2 /*return*/];
+                }
+                if (yargs_1.argv.bla) {
+                    console.log("BLA 2!");
                     return [2 /*return*/];
                 }
                 if (yargs_1.argv._.length === 0) {

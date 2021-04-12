@@ -1,13 +1,10 @@
 import chalk from "chalk";
-import { config } from "dotenv";
 import { existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
-import { argv } from "yargs";
+import { argv, usage } from "yargs";
 // import helpDocs from "./help";
 import ui from "./ui";
 import core from "./index";
-
-config();
 
 // const version = process.env.VERSION as string;
 const helpTip = `Run ${chalk.blue("dotconfig --help")} for documentation`;
@@ -22,14 +19,19 @@ const getArgNumError = (argNumReceived: number) =>
   getExpRecError("number of dotconfig arguments", "1", `${argNumReceived}`);
 
 const run = async () => {
-  if (argv.help) {
+  usage("USAGE!");
+  if (argv.helpB) {
     // console.log(helpDocs(version));
-    console.log("NEW!");
+    console.log("NEW B!");
     return;
   }
-  if (argv.v || argv.version) {
+  if (argv.vB || argv.versionB) {
     // console.log(version);
-    console.log("NEW!");
+    console.log("NEW B!");
+    return;
+  }
+  if (argv.bla) {
+    console.log("BLA 2!");
     return;
   }
   if (argv._.length === 0) {
