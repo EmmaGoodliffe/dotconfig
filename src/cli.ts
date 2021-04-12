@@ -3,13 +3,13 @@ import { config } from "dotenv";
 import { existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
 import { argv } from "yargs";
-import helpDocs from "./help";
+// import helpDocs from "./help";
 import ui from "./ui";
 import core from "./index";
 
 config();
 
-const version = process.env.VERSION as string;
+// const version = process.env.VERSION as string;
 const helpTip = `Run ${chalk.blue("dotconfig --help")} for documentation`;
 
 const getExpRecError = (
@@ -23,11 +23,13 @@ const getArgNumError = (argNumReceived: number) =>
 
 const run = async () => {
   if (argv.help) {
-    console.log(helpDocs(version));
+    // console.log(helpDocs(version));
+    console.log("NEW!");
     return;
   }
   if (argv.v || argv.version) {
-    console.log(version);
+    // console.log(version);
+    console.log("NEW!");
     return;
   }
   if (argv._.length === 0) {

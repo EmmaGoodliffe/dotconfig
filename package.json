@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "tsc && ts-node scripts/build.ts",
+    "cli": "npm run build && npm uninstall dotconfig && npm cache clean --force && npm i -g .",
     "dev": "ts-node test/manual.ts",
     "lint": "eslint \".\" --fix && prettier \".\" --write",
     "prebuild": "ts-node scripts/prebuild.ts",

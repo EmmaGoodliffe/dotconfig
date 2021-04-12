@@ -45,11 +45,11 @@ var dotenv_1 = require("dotenv");
 var fs_1 = require("fs");
 var path_1 = require("path");
 var yargs_1 = require("yargs");
-var help_1 = __importDefault(require("./help"));
+// import helpDocs from "./help";
 var ui_1 = __importDefault(require("./ui"));
 var index_1 = __importDefault(require("./index"));
 dotenv_1.config();
-var version = process.env.VERSION;
+// const version = process.env.VERSION as string;
 var helpTip = "Run " + chalk_1.default.blue("dotconfig --help") + " for documentation";
 var getExpRecError = function (description, expected, received) { return "Expected " + description + " to be " + expected + "; received " + received; };
 var getArgNumError = function (argNumReceived) {
@@ -61,11 +61,13 @@ var run = function () { return __awaiter(void 0, void 0, void 0, function () {
         switch (_a.label) {
             case 0:
                 if (yargs_1.argv.help) {
-                    console.log(help_1.default(version));
+                    // console.log(helpDocs(version));
+                    console.log("NEW!");
                     return [2 /*return*/];
                 }
                 if (yargs_1.argv.v || yargs_1.argv.version) {
-                    console.log(version);
+                    // console.log(version);
+                    console.log("NEW!");
                     return [2 /*return*/];
                 }
                 if (yargs_1.argv._.length === 0) {
