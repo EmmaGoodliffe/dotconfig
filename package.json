@@ -10,10 +10,9 @@
     "dotconfig": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsc && ts-node scripts/build.ts",
+    "build": "rimraf dist && tsc && ts-node scripts/build.ts",
     "dev": "ts-node test/manual.ts",
     "lint": "eslint \".\" --fix && prettier \".\" --write",
-    "prebuild": "ts-node scripts/prebuild.ts",
     "test": "jest"
   },
   "repository": {
