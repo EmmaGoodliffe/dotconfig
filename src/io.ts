@@ -8,7 +8,7 @@ import { Options } from "./index";
 const defaultUrl =
   "https://raw.githubusercontent.com/EmmaGoodliffe/default/master/";
 
-export const getTemplateFile = async (file: string): Promise<string> => {
+export const getTemplateFile = async (file: string) => {
   const url = defaultUrl + file;
   const response = await fetch(url);
   const text = await response.text();
@@ -22,19 +22,22 @@ export const getTemplateFile = async (file: string): Promise<string> => {
   );
 };
 
-export const write = (path: string, text: string): void => {
+export const write = (path: string, text: string) => {
   const pathDir = dirname(path);
   const exists = existsSync(pathDir);
   !exists && mkdirSync(pathDir, { recursive: true });
   writeFileSync(path, text);
 };
 
-const logTitle = (content: string) =>
+const title = (content: string) =>
   console.log(chalk.blue(`=== ${content} ===`));
 
-const runCommandCore = (command: string, dir: string): Promise<void> => {
+export const info = (content: string) =>
+  console.log(`${chalk.blue("i")} ${content}`);
+
+const runCommand = (command: string, dir: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    logTitle(command);
+    title(command);
     const words = command.split(" ");
     const main = words[0];
     const args = words.slice(1);
@@ -44,13 +47,13 @@ const runCommandCore = (command: string, dir: string): Promise<void> => {
   });
 };
 
-export const runCommand = async (
+export const runWrappedCommand = async (
   command: string,
   dir: string,
   onCommandError: Options["ui"]["onCommandError"],
-): Promise<void> => {
+) => {
   try {
-    await runCommandCore(command, dir);
+    await runCommand(command, dir);
   } catch (err) {
     await onCommandError(command, err);
   }

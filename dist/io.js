@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runCommand = exports.write = exports.getTemplateFile = void 0;
+exports.runWrappedCommand = exports.info = exports.write = exports.getTemplateFile = void 0;
 var chalk_1 = __importDefault(require("chalk"));
 var child_process_1 = require("child_process");
 var fs_1 = require("fs");
@@ -73,12 +73,16 @@ var write = function (path, text) {
     fs_1.writeFileSync(path, text);
 };
 exports.write = write;
-var logTitle = function (content) {
+var title = function (content) {
     return console.log(chalk_1.default.blue("=== " + content + " ==="));
 };
-var runCommandCore = function (command, dir) {
+var info = function (content) {
+    return console.log(chalk_1.default.blue("i") + " " + content);
+};
+exports.info = info;
+var runCommand = function (command, dir) {
     return new Promise(function (resolve, reject) {
-        logTitle(command);
+        title(command);
         var words = command.split(" ");
         var main = words[0];
         var args = words.slice(1);
@@ -87,13 +91,13 @@ var runCommandCore = function (command, dir) {
         output.on("error", function (err) { return reject(err); });
     });
 };
-var runCommand = function (command, dir, onCommandError) { return __awaiter(void 0, void 0, void 0, function () {
+var runWrappedCommand = function (command, dir, onCommandError) { return __awaiter(void 0, void 0, void 0, function () {
     var err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 4]);
-                return [4 /*yield*/, runCommandCore(command, dir)];
+                return [4 /*yield*/, runCommand(command, dir)];
             case 1:
                 _a.sent();
                 return [3 /*break*/, 4];
@@ -107,4 +111,4 @@ var runCommand = function (command, dir, onCommandError) { return __awaiter(void
         }
     });
 }); };
-exports.runCommand = runCommand;
+exports.runWrappedCommand = runWrappedCommand;

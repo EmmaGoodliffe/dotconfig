@@ -18,7 +18,7 @@ const getOptions = <T>(packages: T[]) => ({
     onCommandError(err: string) {
       throw new Error(err);
     },
-    inputEnd: (): "both" => "both",
+    inputEnd: () => "both" as const,
     inputPackages: () => packages,
   },
   testing: true,
@@ -35,7 +35,7 @@ const getPackageJson = (dir: string) =>
     scripts: Record<string, string>;
   };
 
-const reset = (parentDir: string): void => {
+const reset = (parentDir: string) => {
   for (const childDir of readdirSync(parentDir)) {
     const path = join(parentDir, childDir);
     rmdirSync(path, { recursive: true });

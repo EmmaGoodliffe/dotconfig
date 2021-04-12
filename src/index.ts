@@ -1,7 +1,8 @@
+import chalk from "chalk";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
-import { getTemplateFile, runCommand, write } from "./io";
+import { getTemplateFile, info, runWrappedCommand, write } from "./io";
 import { sortJson, unique } from "./util";
 
 const packages = {
@@ -76,11 +77,11 @@ const extendEsLintConfig = (
   return base;
 };
 
-export default async (dir: string, options: Options): Promise<string[]> => {
+export default async (dir: string, options: Options) => {
   const { ui, testing } = options;
   const { confirm, inputEnd, inputPackages, onCommandError } = ui;
-  const runCommandShort = (command: string) =>
-    runCommand(command, dir, onCommandError);
+  const runLocalCommand = (command: string) =>
+    runWrappedCommand(command, dir, onCommandError);
   const end = await inputEnd();
   const packageChoices =
     end === "both" ? allPackages : [...packages.both, ...packages[end]];
@@ -89,9 +90,9 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
   !packageJsonExists &&
     (await confirm("Would you like to create a package.json file?", true)) &&
-    (await runCommandShort("npm init"));
+    (await runLocalCommand("npm init"));
   if (requestedPackages.includes("TypeScript")) {
-    await runCommandShort("npx tsc --init");
+    await runLocalCommand("npx tsc --init");
   }
   const devDependencies: string[] = [];
   const scripts: Record<string, string> = {};
@@ -117,7 +118,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         .replace('// "declaration":', '"declaration":')
         .replace('// "declarationMap":', '"declarationMap":');
       write(tsConfigPath, tsConfig);
-      await runCommandShort("npx @microsoft/api-extractor init");
+      await runLocalCommand("npx @microsoft/api-extractor init");
       const apiExtConfigPath = join(dir, "api-extractor.json");
       const apiExtConfigBase = readFileSync(apiExtConfigPath).toString();
       const apiExtConfig = apiExtConfigBase.replace(
@@ -182,11 +183,11 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         devDependencies.push("ts-jest", "@types/jest");
         const indexTestTsPath = join(dir, "src/index.test.ts");
         write(indexTestTsPath, "");
-        await runCommandShort("npx ts-jest config:init");
+        await runLocalCommand("npx ts-jest config:init");
       } else {
         const indexTestJsPath = join(dir, "src/index.test.js");
         write(indexTestJsPath, "");
-        await runCommandShort("npx jest --init");
+        await runLocalCommand("npx jest --init");
       }
     } else if (pkg === "Prettier") {
       if (!requestedPackages.includes("ESLint")) {
@@ -210,7 +211,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
         const tsSveltePath = join(dir, "scripts/tsSvelte.js");
         const tsSvelte = await getTemplateFile("scripts/tsSvelte.js");
         devDependencies.push("@tsconfig/svelte");
-        await runCommandShort("node scripts/tsSvelte.js");
+        await runLocalCommand("node scripts/tsSvelte.js");
         write(tsSveltePath, tsSvelte);
       } else {
         devDependencies.push(
@@ -280,7 +281,7 @@ export default async (dir: string, options: Options): Promise<string[]> => {
           write(indexCssPath, indexCss);
         }
       } else {
-        await runCommandShort(
+        await runLocalCommand(
           "npx tailwindcss-cli@latest build -o src/tailwind.css",
         );
       }
@@ -317,7 +318,14 @@ export default async (dir: string, options: Options): Promise<string[]> => {
   const shouldInstall =
     !testing &&
     (await confirm("Would you like to install NPM dependencies now?", true));
-  shouldInstall &&
-    (await runCommandShort(`npm i -D ${finalDevDependencies.join(" ")}`));
+  if (shouldInstall) {
+    await runLocalCommand(`npm i -D ${finalDevDependencies.join(" ")}`);
+  } else {
+    info(
+      `You can install your dependencies at any time with ${chalk.blue(
+        "dotconfig <path> -i",
+      )}`,
+    );
+  }
   return finalDevDependencies;
 };

@@ -57,6 +57,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var chalk_1 = __importDefault(require("chalk"));
 var fs_1 = require("fs");
 var path_1 = require("path");
 var _eslintrc_json_1 = __importDefault(require("./content/.eslintrc.json"));
@@ -90,51 +91,51 @@ var extendEsLintConfig = function (base, extension) {
     return base;
 };
 exports.default = (function (dir, options) { return __awaiter(void 0, void 0, void 0, function () {
-    var ui, testing, confirm, inputEnd, inputPackages, onCommandError, runCommandShort, end, packageChoices, requestedPackages, packageJsonPath, packageJsonExists, _a, _b, devDependencies, scripts, indexJsPath, indexJs, _i, requestedPackages_1, pkg, tsConfigPath, tsConfig, apiExtConfigPath, apiExtConfigBase, apiExtConfig, prettierQuestion, usePrettier, _c, tsQuestion, useTs, _d, esLintConfigPath, esLintConfig, sortedEsLintConfig, gitIgnoreLines, gitIgnore, gitIgnorePath, files, paths, texts, i, path, text, indexTestTsPath, indexTestJsPath, prettierConfigPath, prettierConfig, rollupConfigPath, rollupConfig, tsSveltePath, tsSvelte, tailwindConfigPath, tailwindConfig, question, indexCss, indexScssPath, indexScss, indexCssPath, tsPath, buildScript, devScript, _e, _f, script, packageJsonBase, allScripts, packageJson, finalDevDependencies, shouldInstall, _g, _h;
-    return __generator(this, function (_j) {
-        switch (_j.label) {
+    var ui, testing, confirm, inputEnd, inputPackages, onCommandError, runLocalCommand, end, packageChoices, requestedPackages, packageJsonPath, packageJsonExists, _a, _b, devDependencies, scripts, indexJsPath, indexJs, _i, requestedPackages_1, pkg, tsConfigPath, tsConfig, apiExtConfigPath, apiExtConfigBase, apiExtConfig, prettierQuestion, usePrettier, _c, tsQuestion, useTs, _d, esLintConfigPath, esLintConfig, sortedEsLintConfig, gitIgnoreLines, gitIgnore, gitIgnorePath, files, paths, texts, i, path, text, indexTestTsPath, indexTestJsPath, prettierConfigPath, prettierConfig, rollupConfigPath, rollupConfig, tsSveltePath, tsSvelte, tailwindConfigPath, tailwindConfig, question, indexCss, indexScssPath, indexScss, indexCssPath, tsPath, buildScript, devScript, _e, _f, script, packageJsonBase, allScripts, packageJson, finalDevDependencies, shouldInstall, _g;
+    return __generator(this, function (_h) {
+        switch (_h.label) {
             case 0:
                 ui = options.ui, testing = options.testing;
                 confirm = ui.confirm, inputEnd = ui.inputEnd, inputPackages = ui.inputPackages, onCommandError = ui.onCommandError;
-                runCommandShort = function (command) {
-                    return io_1.runCommand(command, dir, onCommandError);
+                runLocalCommand = function (command) {
+                    return io_1.runWrappedCommand(command, dir, onCommandError);
                 };
                 return [4 /*yield*/, inputEnd()];
             case 1:
-                end = _j.sent();
+                end = _h.sent();
                 packageChoices = end === "both" ? allPackages : __spreadArrays(packages.both, packages[end]);
                 return [4 /*yield*/, inputPackages(__spreadArrays(packageChoices).sort())];
             case 2:
-                requestedPackages = _j.sent();
+                requestedPackages = _h.sent();
                 packageJsonPath = path_1.join(dir, "package.json");
                 packageJsonExists = fs_1.existsSync(dir) && fs_1.existsSync(packageJsonPath);
                 _b = !packageJsonExists;
                 if (!_b) return [3 /*break*/, 4];
                 return [4 /*yield*/, confirm("Would you like to create a package.json file?", true)];
             case 3:
-                _b = (_j.sent());
-                _j.label = 4;
+                _b = (_h.sent());
+                _h.label = 4;
             case 4:
                 _a = _b;
                 if (!_a) return [3 /*break*/, 6];
-                return [4 /*yield*/, runCommandShort("npm init")];
+                return [4 /*yield*/, runLocalCommand("npm init")];
             case 5:
-                _a = (_j.sent());
-                _j.label = 6;
+                _a = (_h.sent());
+                _h.label = 6;
             case 6:
                 _a;
                 if (!requestedPackages.includes("TypeScript")) return [3 /*break*/, 8];
-                return [4 /*yield*/, runCommandShort("npx tsc --init")];
+                return [4 /*yield*/, runLocalCommand("npx tsc --init")];
             case 7:
-                _j.sent();
-                _j.label = 8;
+                _h.sent();
+                _h.label = 8;
             case 8:
                 devDependencies = [];
                 scripts = {};
                 indexJsPath = path_1.join(dir, "src/index.js");
                 indexJs = "";
                 _i = 0, requestedPackages_1 = requestedPackages;
-                _j.label = 9;
+                _h.label = 9;
             case 9:
                 if (!(_i < requestedPackages_1.length)) return [3 /*break*/, 41];
                 pkg = requestedPackages_1[_i];
@@ -154,9 +155,9 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                     .replace('// "declaration":', '"declaration":')
                     .replace('// "declarationMap":', '"declarationMap":');
                 io_1.write(tsConfigPath, tsConfig);
-                return [4 /*yield*/, runCommandShort("npx @microsoft/api-extractor init")];
+                return [4 /*yield*/, runLocalCommand("npx @microsoft/api-extractor init")];
             case 10:
-                _j.sent();
+                _h.sent();
                 apiExtConfigPath = path_1.join(dir, "api-extractor.json");
                 apiExtConfigBase = fs_1.readFileSync(apiExtConfigPath).toString();
                 apiExtConfig = apiExtConfigBase.replace('"mainEntryPointFilePath": "<projectFolder>/lib', '"mainEntryPointFilePath": ".');
@@ -176,8 +177,8 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 if (!_c) return [3 /*break*/, 14];
                 return [4 /*yield*/, confirm(prettierQuestion, true)];
             case 13:
-                _c = (_j.sent());
-                _j.label = 14;
+                _c = (_h.sent());
+                _h.label = 14;
             case 14:
                 usePrettier = _c;
                 tsQuestion = getExtensionQuestion(pkg, "TypeScript");
@@ -185,8 +186,8 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 if (!_d) return [3 /*break*/, 16];
                 return [4 /*yield*/, confirm(tsQuestion, true)];
             case 15:
-                _d = (_j.sent());
-                _j.label = 16;
+                _d = (_h.sent());
+                _h.label = 16;
             case 16:
                 useTs = _d;
                 esLintConfigPath = path_1.join(dir, ".eslintrc.json");
@@ -222,7 +223,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 paths = files.map(function (file) { return path_1.join(dir, file); });
                 return [4 /*yield*/, Promise.all(files.map(io_1.getTemplateFile))];
             case 19:
-                texts = _j.sent();
+                texts = _h.sent();
                 for (i in paths) {
                     path = paths[i];
                     text = texts[i];
@@ -237,17 +238,17 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 devDependencies.push("ts-jest", "@types/jest");
                 indexTestTsPath = path_1.join(dir, "src/index.test.ts");
                 io_1.write(indexTestTsPath, "");
-                return [4 /*yield*/, runCommandShort("npx ts-jest config:init")];
+                return [4 /*yield*/, runLocalCommand("npx ts-jest config:init")];
             case 21:
-                _j.sent();
+                _h.sent();
                 return [3 /*break*/, 24];
             case 22:
                 indexTestJsPath = path_1.join(dir, "src/index.test.js");
                 io_1.write(indexTestJsPath, "");
-                return [4 /*yield*/, runCommandShort("npx jest --init")];
+                return [4 /*yield*/, runLocalCommand("npx jest --init")];
             case 23:
-                _j.sent();
-                _j.label = 24;
+                _h.sent();
+                _h.label = 24;
             case 24: return [3 /*break*/, 40];
             case 25:
                 if (!(pkg === "Prettier")) return [3 /*break*/, 27];
@@ -257,7 +258,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 prettierConfigPath = path_1.join(dir, ".prettierrc");
                 return [4 /*yield*/, io_1.getTemplateFile(".prettierrc")];
             case 26:
-                prettierConfig = _j.sent();
+                prettierConfig = _h.sent();
                 io_1.write(prettierConfigPath, prettierConfig);
                 return [3 /*break*/, 40];
             case 27:
@@ -274,17 +275,17 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 rollupConfigPath = path_1.join(dir, "rollup.config.js");
                 return [4 /*yield*/, io_1.getTemplateFile("rollup.config.js")];
             case 29:
-                rollupConfig = _j.sent();
+                rollupConfig = _h.sent();
                 io_1.write(rollupConfigPath, rollupConfig);
                 if (!requestedPackages.includes("TypeScript")) return [3 /*break*/, 32];
                 tsSveltePath = path_1.join(dir, "scripts/tsSvelte.js");
                 return [4 /*yield*/, io_1.getTemplateFile("scripts/tsSvelte.js")];
             case 30:
-                tsSvelte = _j.sent();
+                tsSvelte = _h.sent();
                 devDependencies.push("@tsconfig/svelte");
-                return [4 /*yield*/, runCommandShort("node scripts/tsSvelte.js")];
+                return [4 /*yield*/, runLocalCommand("node scripts/tsSvelte.js")];
             case 31:
-                _j.sent();
+                _h.sent();
                 io_1.write(tsSveltePath, tsSvelte);
                 return [3 /*break*/, 33];
             case 32:
@@ -301,7 +302,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                     "",
                     "export default app;",
                 ].join("\n");
-                _j.label = 33;
+                _h.label = 33;
             case 33: return [3 /*break*/, 40];
             case 34:
                 if (!(pkg === "Tailwind")) return [3 /*break*/, 39];
@@ -326,7 +327,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 question = "Would you like to use custom CSS with Tailwind?";
                 return [4 /*yield*/, confirm(question, true)];
             case 35:
-                if (!_j.sent()) return [3 /*break*/, 36];
+                if (!_h.sent()) return [3 /*break*/, 36];
                 devDependencies.push("tailwindcss-cli");
                 indexCss = [
                     "@tailwind base;",
@@ -351,10 +352,10 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                     io_1.write(indexCssPath, indexCss);
                 }
                 return [3 /*break*/, 38];
-            case 36: return [4 /*yield*/, runCommandShort("npx tailwindcss-cli@latest build -o src/tailwind.css")];
+            case 36: return [4 /*yield*/, runLocalCommand("npx tailwindcss-cli@latest build -o src/tailwind.css")];
             case 37:
-                _j.sent();
-                _j.label = 38;
+                _h.sent();
+                _h.label = 38;
             case 38: return [3 /*break*/, 40];
             case 39:
                 if (pkg === "TypeScript") {
@@ -363,7 +364,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                     tsPath = path_1.join(dir, "src/index.ts");
                     io_1.write(tsPath, "");
                 }
-                _j.label = 40;
+                _h.label = 40;
             case 40:
                 _i++;
                 return [3 /*break*/, 9];
@@ -393,19 +394,19 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 if (!_g) return [3 /*break*/, 43];
                 return [4 /*yield*/, confirm("Would you like to install NPM dependencies now?", true)];
             case 42:
-                _g = (_j.sent());
-                _j.label = 43;
+                _g = (_h.sent());
+                _h.label = 43;
             case 43:
                 shouldInstall = _g;
-                _h = shouldInstall;
-                if (!_h) return [3 /*break*/, 45];
-                return [4 /*yield*/, runCommandShort("npm i -D " + finalDevDependencies.join(" "))];
+                if (!shouldInstall) return [3 /*break*/, 45];
+                return [4 /*yield*/, runLocalCommand("npm i -D " + finalDevDependencies.join(" "))];
             case 44:
-                _h = (_j.sent());
-                _j.label = 45;
+                _h.sent();
+                return [3 /*break*/, 46];
             case 45:
-                _h;
-                return [2 /*return*/, finalDevDependencies];
+                io_1.info("You can install your dependencies at any time with " + chalk_1.default.blue("dotconfig <path> -i"));
+                _h.label = 46;
+            case 46: return [2 /*return*/, finalDevDependencies];
         }
     });
 }); });

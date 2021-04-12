@@ -1,6 +1,5 @@
 import { existsSync, readFileSync, rmdirSync, writeFileSync } from "fs";
-import { basename, join } from "path";
-import { logCompletion } from "./io";
+import { join } from "path";
 
 const path = join(__dirname, "../dist");
 
@@ -15,6 +14,3 @@ const { version } = packageJson;
 const envPath = join(__dirname, "../.env");
 const envContent = `VERSION=${version}`;
 writeFileSync(envPath, envContent);
-
-const script = basename(__filename, ".ts");
-logCompletion(script);

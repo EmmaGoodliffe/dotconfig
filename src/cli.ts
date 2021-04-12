@@ -5,7 +5,7 @@ import ui from "./ui";
 import core from "./index";
 
 const run = async () => {
-  yargs.usage("$0 <path> [options]");
+  yargs.usage("Usage: $0 <path> [options]");
   yargs.demandCommand(1);
   yargs.alias("v", "version");
   yargs.example("$0 .", "Configure current directory");

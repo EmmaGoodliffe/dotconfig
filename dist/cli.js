@@ -69,7 +69,7 @@ var run = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                yargs_1.default.usage("$0 <path> [options]");
+                yargs_1.default.usage("Usage: $0 <path> [options]");
                 yargs_1.default.demandCommand(1);
                 yargs_1.default.alias("v", "version");
                 yargs_1.default.example("$0 .", "Configure current directory");

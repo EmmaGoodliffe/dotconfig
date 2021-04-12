@@ -1,7 +1,7 @@
 import { spawnSync } from "child_process";
 import { mkdirSync, readFileSync } from "fs";
 import { join } from "path";
-import { getTemplateFile, runCommand, write } from "../src/io";
+import { getTemplateFile, runWrappedCommand, write } from "../src/io";
 
 const parentDir = join(__dirname, "output");
 
@@ -22,8 +22,8 @@ test("getTemplateFile", async () => {
   }
 });
 
-test("runCommand", async () => {
-  runCommand('echo "hi"', getDir(), console.error);
+test("runWrappedCommand", async () => {
+  runWrappedCommand('echo "hi"', getDir(), console.error);
 });
 
 test("write", async () => {
