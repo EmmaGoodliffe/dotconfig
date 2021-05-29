@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync } from "fs";
 import { join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
 import { getTemplateFile, info, runCommand, write } from "./io";
@@ -96,6 +96,7 @@ export default async (dir: string, options: Options) => {
   if (requestedPackages.includes("TypeScript")) {
     await runLocalCommand("npx tsc --init");
   }
+  mkdirSync(join(dir, "src"));
   const devDependencies: string[] = [];
   const scripts: Record<string, string> = {};
   for (const pkg of requestedPackages) {
@@ -204,6 +205,8 @@ export default async (dir: string, options: Options) => {
       devDependencies.push("sass");
       if (!requestedPackages.includes("Tailwind")) {
         scripts["build:scss"] = "sass src/index.scss public/index.css";
+        const indexScssPath = join(dir, "src/index.scss");
+        write(indexScssPath, "");
       }
     } else if (pkg === "Svelte") {
       scripts["build:svelte"] = "rollup -c";
@@ -211,13 +214,13 @@ export default async (dir: string, options: Options) => {
       const rollupConfigPath = join(dir, "rollup.config.js");
       const rollupConfig = await getTemplateFile("rollup.config.js");
       write(rollupConfigPath, rollupConfig);
+      scripts.start = 'echo \\"No start script yet\\"';
       if (requestedPackages.includes("TypeScript")) {
         const tsSveltePath = join(dir, "scripts/tsSvelte.js");
         const tsSvelte = await getTemplateFile("scripts/tsSvelte.js");
         devDependencies.push("@tsconfig/svelte");
         write(tsSveltePath, tsSvelte);
         await runLocalCommand("node scripts/tsSvelte.js");
-        // TODO: Add `export {}` to typescript files
       } else {
         devDependencies.push(
           "@rollup/plugin-commonjs@^16.0.0",
