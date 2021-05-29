@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync } from "fs";
 import { join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
 import { getTemplateFile, info, runCommand, write } from "./io";
-import { sortJson, unique } from "./util";
+import { deleteProperty, sortJson, unique } from "./util";
 
 const packages = {
   front: ["SCSS", "Svelte", "Tailwind"],
@@ -16,7 +16,6 @@ const allPackages = [
   ...packages.both,
 ] as const;
 
-type Extends<T, U extends T> = U;
 type PossiblePromise<T> = T | Promise<T>;
 
 type Package = typeof allPackages[number];
@@ -48,7 +47,7 @@ const getExtensionQuestion = (base: Package, extension: Package) =>
 
 const extendEsLintConfig = (
   base: EsLintConfig,
-  extension: Extends<Package, "Prettier" | "TypeScript">,
+  extension: Extract<Package, "Prettier" | "TypeScript">,
 ) => {
   if (extension === "Prettier") {
     return {
@@ -98,7 +97,7 @@ export default async (dir: string, options: Options) => {
   }
   mkdirSync(join(dir, "src"));
   const devDependencies: string[] = [];
-  const scripts: Record<string, string> = {};
+  const scripts: Record<string, string> = { lint: "" };
   for (const pkg of requestedPackages) {
     if (!isPackage(pkg)) {
       throw new Error(`Expected a valid package. Received: ${pkg}`);
@@ -132,7 +131,7 @@ export default async (dir: string, options: Options) => {
       write(join(dir, ".env"), "");
     } else if (pkg === "ESLint") {
       devDependencies.push("eslint", "eslint-plugin-import");
-      scripts.lint = 'eslint "." --fix';
+      scripts.lint += ' && eslint "." --fix';
       const prettierQuestion = getExtensionQuestion(pkg, "Prettier");
       const usePrettier =
         requestedPackages.includes("Prettier") &&
@@ -144,7 +143,6 @@ export default async (dir: string, options: Options) => {
       const esLintConfigPath = join(dir, ".eslintrc.json");
       let esLintConfig: EsLintConfig = { ...esLintConfigBase };
       if (usePrettier) {
-        scripts.lint += ' && prettier "." --write';
         esLintConfig = extendEsLintConfig(esLintConfig, "Prettier");
         devDependencies.push("eslint-plugin-prettier");
       }
@@ -195,9 +193,7 @@ export default async (dir: string, options: Options) => {
       }
     } else if (pkg === "Prettier") {
       devDependencies.push("prettier");
-      if (!requestedPackages.includes("ESLint")) {
-        scripts.lint = 'prettier "." --write';
-      }
+      scripts.lint += ' && prettier "." --write';
       const prettierConfigPath = join(dir, ".prettierrc");
       const prettierConfig = await getTemplateFile(".prettierrc");
       write(prettierConfigPath, prettierConfig);
@@ -211,6 +207,7 @@ export default async (dir: string, options: Options) => {
     } else if (pkg === "Svelte") {
       scripts["build:svelte"] = "rollup -c";
       scripts["dev:svelte"] = "rollup -c -w";
+      scripts.lint += " && svelte-check";
       const rollupConfigPath = join(dir, "rollup.config.js");
       const rollupConfig = await getTemplateFile("rollup.config.js");
       write(rollupConfigPath, rollupConfig);
@@ -317,8 +314,12 @@ export default async (dir: string, options: Options) => {
   }
   scripts.build = buildScript.slice(" && ".length);
   scripts.dev = devScript.slice(" && ".length);
+  scripts.lint = scripts.lint.slice(" && ".length);
   const packageJsonBase = JSON.parse(readFileSync(packageJsonPath).toString());
-  const allScripts = { ...packageJsonBase.scripts, ...scripts };
+  const allScripts = deleteProperty(
+    { ...packageJsonBase.scripts, ...scripts },
+    "validate",
+  );
   const packageJson = {
     ...packageJsonBase,
     scripts: sortJson(allScripts),

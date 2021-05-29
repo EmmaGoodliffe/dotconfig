@@ -16,3 +16,12 @@ export const sortJson = <T>(object: T): T => {
   }
   return object;
 };
+
+export const deleteProperty = <T extends Record<string, unknown>>(
+  obj: T,
+  property: string,
+) => {
+  const result = { ...obj };
+  delete result[property];
+  return result;
+};

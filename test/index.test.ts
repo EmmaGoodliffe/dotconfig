@@ -15,11 +15,12 @@ const getDir = () => {
 const getOptions = <T>(packages: T[]) => ({
   ui: {
     confirm: (label: string, defaultAnswer: boolean) => defaultAnswer,
+    inputEnd: () => "both" as const,
+    inputPackages: () => packages,
+    log: () => {},
     onCommandError(err: string) {
       throw new Error(err);
     },
-    inputEnd: () => "both" as const,
-    inputPackages: () => packages,
   },
   testing: true,
 });

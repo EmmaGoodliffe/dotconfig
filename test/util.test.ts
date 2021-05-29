@@ -1,4 +1,10 @@
-import { sortJson, unique } from "../src/util";
+import { deleteProperty, sortJson, unique } from "../src/util";
+
+test("deleteProperty", async () => {
+  const obj = { a: 0, b: 1 };
+  expect(deleteProperty(obj, "a")).toEqual({ b: 1 });
+  expect(deleteProperty(obj, "c")).toEqual(obj);
+});
 
 test("sortJson", async () => {
   const good = { a: 0, b: 1 };
@@ -12,8 +18,6 @@ test("sortJson", async () => {
 });
 
 test("unique", async () => {
-  const good = [0, 1, 2];
-  const bad = [0, 1, 1];
-  expect(unique(good)).toEqual(good);
-  expect(unique(bad)).not.toEqual(bad);
+  expect(unique([0, 1, 2])).toEqual([0, 1, 2]);
+  expect(unique([0, 1, 1])).toEqual([0, 1]);
 });
