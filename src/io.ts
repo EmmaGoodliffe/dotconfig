@@ -32,30 +32,23 @@ export const write = (path: string, text: string) => {
 export const info = (content: string, log: Options["ui"]["log"]) =>
   log(`${chalk.blue("i")} ${content}`);
 
-const runCommand = async (
-  command: string,
-  dir: string,
-  log: Options["ui"]["log"],
-): Promise<void> => {
-  await log(chalk.blue(`=== ${command} ===`));
-  return new Promise((resolve, reject) => {
-    const words = command.split(" ");
-    const main = words[0];
-    const args = words.slice(1);
-    const output = spawn(main, args, { cwd: dir, stdio: "inherit" });
-    output.on("close", () => resolve());
-    output.on("error", err => reject(err));
-  });
-};
-
-export const runWrappedCommand = async (
+export const runCommand = async (
   command: string,
   dir: string,
   log: Options["ui"]["log"],
   onCommandError: Options["ui"]["onCommandError"],
 ) => {
+  await log(chalk.blue(`=== ${command} ===`));
   try {
-    await runCommand(command, dir, log);
+    await new Promise<void>((resolve, reject) => {
+      const words = command.split(" ");
+      const main = words[0];
+      const args = words.slice(1);
+      const output = spawn(main, args, { cwd: dir, stdio: "inherit" });
+      output.on("close", () => resolve());
+      output.on("error", err => reject(err));
+    });
+    await log("");
   } catch (err) {
     await onCommandError(command, err);
   }

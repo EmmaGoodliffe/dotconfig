@@ -98,7 +98,7 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
                 ui = options.ui, testing = options.testing;
                 confirm = ui.confirm, inputEnd = ui.inputEnd, inputPackages = ui.inputPackages, log = ui.log, onCommandError = ui.onCommandError;
                 runLocalCommand = function (command) {
-                    return io_1.runWrappedCommand(command, dir, log, onCommandError);
+                    return io_1.runCommand(command, dir, log, onCommandError);
                 };
                 return [4 /*yield*/, inputEnd()];
             case 1:
@@ -283,10 +283,10 @@ exports.default = (function (dir, options) { return __awaiter(void 0, void 0, vo
             case 30:
                 tsSvelte = _h.sent();
                 devDependencies.push("@tsconfig/svelte");
+                io_1.write(tsSveltePath, tsSvelte);
                 return [4 /*yield*/, runLocalCommand("node scripts/tsSvelte.js")];
             case 31:
                 _h.sent();
-                io_1.write(tsSveltePath, tsSvelte);
                 return [3 /*break*/, 33];
             case 32:
                 devDependencies.push("@rollup/plugin-commonjs@^16.0.0", "@rollup/plugin-node-resolve@^10.0.0", "rollup@^2.3.4", "rollup-plugin-css-only@^3.1.0", "rollup-plugin-livereload@^2.0.0", "rollup-plugin-svelte@^7.0.0", "rollup-plugin-terser@^7.0.0", "svelte@^3.0.0");

@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
-import { getTemplateFile, info, runWrappedCommand, write } from "./io";
+import { getTemplateFile, info, runCommand, write } from "./io";
 import { sortJson, unique } from "./util";
 
 const packages = {
@@ -56,7 +56,8 @@ const extendEsLintConfig = (
       plugins: [...base.plugins, "prettier"],
       rules: { ...base.rules, "prettier/prettier": "error" },
     };
-  } else if (extension === "TypeScript") {
+  }
+  if (extension === "TypeScript") {
     return {
       ...base,
       extends: [
@@ -82,7 +83,7 @@ export default async (dir: string, options: Options) => {
   const { ui, testing } = options;
   const { confirm, inputEnd, inputPackages, log, onCommandError } = ui;
   const runLocalCommand = (command: string) =>
-    runWrappedCommand(command, dir, log, onCommandError);
+    runCommand(command, dir, log, onCommandError);
   const end = await inputEnd();
   const packageChoices =
     end === "both" ? allPackages : [...packages.both, ...packages[end]];
@@ -97,8 +98,6 @@ export default async (dir: string, options: Options) => {
   }
   const devDependencies: string[] = [];
   const scripts: Record<string, string> = {};
-  const indexJsPath = join(dir, "src/index.js");
-  let indexJs = "";
   for (const pkg of requestedPackages) {
     if (!isPackage(pkg)) {
       throw new Error(`Expected a valid package. Received: ${pkg}`);
@@ -146,7 +145,7 @@ export default async (dir: string, options: Options) => {
       if (usePrettier) {
         scripts.lint += ' && prettier "." --write';
         esLintConfig = extendEsLintConfig(esLintConfig, "Prettier");
-        devDependencies.push("prettier", "eslint-plugin-prettier");
+        devDependencies.push("eslint-plugin-prettier");
       }
       if (useTs) {
         esLintConfig = extendEsLintConfig(esLintConfig, "TypeScript");
@@ -183,7 +182,10 @@ export default async (dir: string, options: Options) => {
       if (requestedPackages.includes("TypeScript")) {
         devDependencies.push("ts-jest", "@types/jest");
         const indexTestTsPath = join(dir, "src/index.test.ts");
-        write(indexTestTsPath, "");
+        const indexTestTs = requestedPackages.includes("Svelte")
+          ? "export {}"
+          : "";
+        write(indexTestTsPath, indexTestTs);
         await runLocalCommand("npx ts-jest config:init");
       } else {
         const indexTestJsPath = join(dir, "src/index.test.js");
@@ -191,6 +193,7 @@ export default async (dir: string, options: Options) => {
         await runLocalCommand("npx jest --init");
       }
     } else if (pkg === "Prettier") {
+      devDependencies.push("prettier");
       if (!requestedPackages.includes("ESLint")) {
         scripts.lint = 'prettier "." --write';
       }
@@ -212,8 +215,9 @@ export default async (dir: string, options: Options) => {
         const tsSveltePath = join(dir, "scripts/tsSvelte.js");
         const tsSvelte = await getTemplateFile("scripts/tsSvelte.js");
         devDependencies.push("@tsconfig/svelte");
-        await runLocalCommand("node scripts/tsSvelte.js");
         write(tsSveltePath, tsSvelte);
+        await runLocalCommand("node scripts/tsSvelte.js");
+        // TODO: Add `export {}` to typescript files
       } else {
         devDependencies.push(
           "@rollup/plugin-commonjs@^16.0.0",
@@ -225,7 +229,8 @@ export default async (dir: string, options: Options) => {
           "rollup-plugin-terser@^7.0.0",
           "svelte@^3.0.0",
         );
-        indexJs = [
+        const indexJsPath = join(dir, "src/index.js");
+        const indexJs = [
           'import App from "./App.svelte";',
           "",
           "const app = new App({",
@@ -237,6 +242,9 @@ export default async (dir: string, options: Options) => {
           "",
           "export default app;",
         ].join("\n");
+        if (!requestedPackages.includes("TypeScript")) {
+          write(indexJsPath, indexJs);
+        }
       }
     } else if (pkg === "Tailwind") {
       devDependencies.push("tailwindcss");
@@ -289,12 +297,10 @@ export default async (dir: string, options: Options) => {
     } else if (pkg === "TypeScript") {
       devDependencies.push("typescript");
       scripts["build:ts"] = "tsc";
-      const tsPath = join(dir, "src/index.ts");
-      write(tsPath, "");
+      const indexTsPath = join(dir, "src/index.ts");
+      const indexTs = requestedPackages.includes("Svelte") ? "export {}" : "";
+      write(indexTsPath, indexTs);
     }
-  }
-  if (!requestedPackages.includes("TypeScript")) {
-    write(indexJsPath, indexJs);
   }
   let buildScript = "";
   let devScript = "";
@@ -319,12 +325,13 @@ export default async (dir: string, options: Options) => {
   const shouldInstall =
     !testing &&
     (await confirm("Would you like to install NPM dependencies now?", true));
+  const installCommand = `npm i -D ${finalDevDependencies.join(" ")}`;
   if (shouldInstall) {
-    await runLocalCommand(`npm i -D ${finalDevDependencies.join(" ")}`);
+    await runLocalCommand(installCommand);
   } else {
     await info(
       `You can install your dependencies at any time with ${chalk.blue(
-        "dotconfig <path> -i",
+        installCommand,
       )}`,
       log,
     );

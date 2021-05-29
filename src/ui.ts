@@ -11,9 +11,8 @@ const plainDividerCheckboxes = <T extends string>(
   const dividerChoices: (
     | { name: T }
     | { name: typeof divider; disabled: true }
-  )[] = [...choices];
-  dividerChoices.push({ name: divider, disabled: true });
-  return checkboxes<T, typeof divider, never>(label, dividerChoices);
+  )[] = [...choices, { name: divider, disabled: true }];
+  return checkboxes<T, typeof divider>(label, dividerChoices);
 };
 
 const ui: Options["ui"] = {

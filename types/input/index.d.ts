@@ -11,19 +11,19 @@ interface ChoiceWithValue<N, V> extends Choice<N> {
   value?: V;
 }
 
-interface DisabledChoice<N, V> extends ChoiceWithValue<N, V> {
+interface DisabledChoice<N> extends ChoiceWithValue<N, never> {
   disabled: true;
 }
 
 declare module "input" {
-  function checkboxes<N, DN, DV>(
+  function checkboxes<N, DN>(
     label: string,
-    choices: (Cb<Choice<N>> | Cb<DisabledChoice<DN, DV>>)[],
+    choices: (Cb<Choice<N>> | Cb<DisabledChoice<DN>>)[],
     options?: { validate?: Validate<N[]> },
   ): Promise<N[]>;
-  function checkboxes<N, DN, DV, V>(
+  function checkboxes<N, DN, V>(
     label: string,
-    choices: (Cb<ChoiceWithValue<N, V>> | Cb<DisabledChoice<DN, DV>>)[],
+    choices: (Cb<ChoiceWithValue<N, V>> | Cb<DisabledChoice<DN>>)[],
     options?: { validate?: Validate<V[]> },
   ): Promise<V[]>;
   function confirm(
@@ -38,6 +38,6 @@ declare module "input" {
   function select<N, V>(
     label: string,
     choices: ChoiceWithValue<N, V>[],
-    options?: { default?: N; validate?: Validate<V> },
+    options?: { default?: V; validate?: Validate<V> },
   ): Promise<V>;
 }
