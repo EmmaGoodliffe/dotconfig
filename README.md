@@ -17,3 +17,5 @@ Generate config files and boilerplate with ease
 ## Tailwind
 
 - Remove SCSS integration?
+- Fix Svelte isolated modules bug using `export {}`
+- Add start script when using rollup
