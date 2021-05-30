@@ -43,8 +43,8 @@ interface Ui {
 }
 
 export interface Options {
-  ui: Ui;
   testing?: boolean;
+  ui: Ui;
 }
 
 const isPackage = (pkg: string): pkg is Package =>
@@ -90,8 +90,7 @@ const extendEsLintConfig = (
 };
 
 export default async (dir: string, options: Options) => {
-  const { ui, testing } = options;
-  const { confirm, inputEnd, inputPackages, log, onCommandError } = ui;
+  const { confirm, inputEnd, inputPackages, log, onCommandError } = options.ui;
   const runLocalCommand = (command: string) =>
     runCommand(command, dir, log, onCommandError);
   const end = await inputEnd();
@@ -351,7 +350,7 @@ export default async (dir: string, options: Options) => {
   const finalDependencies = unique(dependencies).sort();
   const finalDevDependencies = unique(devDependencies).sort();
   const shouldInstall =
-    !testing &&
+    !options.testing &&
     (await confirm("Would you like to install NPM dependencies now?", true));
   const installCommand = `npm i ${finalDependencies.join(" ")}`;
   const installDevCommand = `npm i -D ${finalDevDependencies.join(" ")}`;

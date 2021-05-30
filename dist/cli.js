@@ -53,11 +53,6 @@ var run = function () { return __awaiter(void 0, void 0, void 0, function () {
                 yargs_1.default.usage("Usage: $0 <path> [options]");
                 yargs_1.default.demandCommand(1);
                 yargs_1.default.alias("v", "version");
-                yargs_1.default.option("y", {
-                    alias: "yes",
-                    type: "boolean",
-                    description: "Use the default answer to questions",
-                });
                 yargs_1.default.example("$0 .", "Configure current directory");
                 yargs_1.default.example("$0 ./foo/bar", "Configure child directory");
                 dir = path_1.join(path_1.dirname(""), "" + yargs_1.default.argv._[0]);
