@@ -1,14 +1,22 @@
-import chalk from "chalk";
 import { existsSync, mkdirSync, readFileSync } from "fs";
 import { join } from "path";
 import esLintConfigBase from "./content/.eslintrc.json";
-import { getTemplateFile, info, runCommand, write } from "./io";
+import { getTemplateFile, runCommand, write } from "./io";
 import { deleteProperty, sortJson, unique } from "./util";
 
 const packages = {
   front: ["SCSS", "Svelte", "Tailwind"],
   back: ["API Extractor"],
-  both: ["Dotenv", "ESLint", "Git", "GitHub", "Jest", "Prettier", "TypeScript"],
+  both: [
+    "Dotenv",
+    "ESLint",
+    "Firebase",
+    "Git",
+    "GitHub",
+    "Jest",
+    "Prettier",
+    "TypeScript",
+  ],
 } as const;
 const allPackages = [
   ...packages.front,
@@ -96,6 +104,7 @@ export default async (dir: string, options: Options) => {
     await runLocalCommand("npx tsc --init");
   }
   mkdirSync(join(dir, "src"));
+  const dependencies: string[] = [];
   const devDependencies: string[] = [];
   const scripts: Record<string, string> = { lint: "" };
   for (const pkg of requestedPackages) {
@@ -155,6 +164,9 @@ export default async (dir: string, options: Options) => {
       }
       const sortedEsLintConfig = sortJson(esLintConfig);
       write(esLintConfigPath, JSON.stringify(sortedEsLintConfig, null, 2));
+    } else if (pkg === "Firebase") {
+      dependencies.push("firebase");
+      await runLocalCommand("npx firebase-tools init");
     } else if (pkg === "Git") {
       const gitIgnoreLines = ["node_modules"];
       requestedPackages.includes("Dotenv") && gitIgnoreLines.push(".env");
@@ -298,7 +310,17 @@ export default async (dir: string, options: Options) => {
       devDependencies.push("typescript");
       scripts["build:ts"] = "tsc";
       const indexTsPath = join(dir, "src/index.ts");
-      const indexTs = requestedPackages.includes("Svelte") ? "export {}" : "";
+      const svelteTs = "export {}";
+      const firebaseTs = [
+        'import firebase from "firebase/app";',
+        "",
+        "firebase.initializeApp({/* ... */});",
+      ].join("\n");
+      const indexTs = requestedPackages.includes("Firebase")
+        ? firebaseTs
+        : requestedPackages.includes("Svelte")
+        ? svelteTs
+        : "";
       write(indexTsPath, indexTs);
     }
   }
@@ -325,20 +347,19 @@ export default async (dir: string, options: Options) => {
     scripts: sortJson(allScripts),
   };
   write(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  const finalDependencies = unique(dependencies).sort();
   const finalDevDependencies = unique(devDependencies).sort();
   const shouldInstall =
     !testing &&
     (await confirm("Would you like to install NPM dependencies now?", true));
-  const installCommand = `npm i -D ${finalDevDependencies.join(" ")}`;
+  const installCommand = `npm i ${finalDependencies.join(" ")}`;
+  const installDevCommand = `npm i -D ${finalDevDependencies.join(" ")}`;
   if (shouldInstall) {
     await runLocalCommand(installCommand);
-  } else {
-    await info(
-      `You can install your dependencies at any time with ${chalk.blue(
-        installCommand,
-      )}`,
-      log,
-    );
+    await runLocalCommand(installDevCommand);
   }
-  return finalDevDependencies;
+  return {
+    dependencies: finalDependencies,
+    devDependencies: finalDevDependencies,
+  };
 };
