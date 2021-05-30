@@ -1,24 +1,5 @@
 #! /usr/bin/env node
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -61,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs_1 = require("fs");
 var path_1 = require("path");
-var yargs_1 = __importStar(require("yargs"));
+var yargs_1 = __importDefault(require("yargs"));
 var ui_1 = __importDefault(require("./ui"));
 var index_1 = __importDefault(require("./index"));
 var run = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -72,9 +53,14 @@ var run = function () { return __awaiter(void 0, void 0, void 0, function () {
                 yargs_1.default.usage("Usage: $0 <path> [options]");
                 yargs_1.default.demandCommand(1);
                 yargs_1.default.alias("v", "version");
+                yargs_1.default.option("y", {
+                    alias: "yes",
+                    type: "boolean",
+                    description: "Use the default answer to questions",
+                });
                 yargs_1.default.example("$0 .", "Configure current directory");
                 yargs_1.default.example("$0 ./foo/bar", "Configure child directory");
-                dir = path_1.join(path_1.dirname(""), "" + yargs_1.argv._[0]);
+                dir = path_1.join(path_1.dirname(""), "" + yargs_1.default.argv._[0]);
                 !fs_1.existsSync(dir) && fs_1.mkdirSync(dir, { recursive: true });
                 return [4 /*yield*/, index_1.default(dir, { ui: ui_1.default })];
             case 1:

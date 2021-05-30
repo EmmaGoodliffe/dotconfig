@@ -91,10 +91,10 @@ var extendEsLintConfig = function (base, extension) {
         return __assign(__assign({}, base), { extends: __spreadArrays(base.extends, [
                 "plugin:@typescript-eslint/recommended",
                 "plugin:import/typescript",
-            ]), parser: "@typescript-eslint/parser", plugins: __spreadArrays(base.plugins, ["@typescript-eslint"]), rules: __assign(__assign({}, base.rules), { "@typescript-eslint/no-empty-function": [
+            ]), parser: "@typescript-eslint/parser", parserOptions: __assign(__assign({}, base.parserOptions), { project: "tsconfig.json" }), plugins: __spreadArrays(base.plugins, ["@typescript-eslint", "ts-exports"]), rules: __assign(__assign({}, base.rules), { "@typescript-eslint/explicit-module-boundary-types": "off", "@typescript-eslint/no-empty-function": [
                     "error",
                     { allow: ["arrowFunctions"] },
-                ] }) });
+                ], "ts-exports/unused-exports": "error" }) });
     }
     return base;
 };
