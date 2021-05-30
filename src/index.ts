@@ -104,6 +104,7 @@ export default async (dir: string, options: Options) => {
     await runLocalCommand("npx tsc --init");
   }
   mkdirSync(join(dir, "src"));
+  end !== "back" && write(join(dir, "src/index.html"), "");
   const dependencies: string[] = [];
   const devDependencies: string[] = [];
   const scripts: Record<string, string> = { lint: "" };
