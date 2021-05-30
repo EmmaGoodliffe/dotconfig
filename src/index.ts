@@ -97,14 +97,11 @@ export default async (dir: string, options: Options) => {
   const requestedPackages = await inputPackages([...packageChoices].sort());
   const packageJsonPath = join(dir, "package.json");
   const packageJsonExists = existsSync(dir) && existsSync(packageJsonPath);
-  !packageJsonExists &&
-    (await confirm("Would you like to create a package.json file?", true)) &&
-    (await runLocalCommand("npm init"));
+  !packageJsonExists && (await runLocalCommand("npm init"));
   if (requestedPackages.includes("TypeScript")) {
     await runLocalCommand("npx tsc --init");
   }
   mkdirSync(join(dir, "src"));
-  end !== "back" && write(join(dir, "src/index.html"), "");
   const dependencies: string[] = [];
   const devDependencies: string[] = [];
   const scripts: Record<string, string> = { lint: "" };
@@ -261,26 +258,26 @@ export default async (dir: string, options: Options) => {
       }
     } else if (pkg === "Tailwind") {
       devDependencies.push("tailwindcss");
-      const tailwindConfigPath = join(dir, "tailwind.config.js");
-      const tailwindConfig = [
-        'const colors = require("tailwindcss/colors");',
-        "",
-        "module.exports = {",
-        "  theme: {",
-        "    extend: {",
-        "      colors: {",
-        "        cyan: colors.cyan,",
-        "      },",
-        "    },",
-        "  },",
-        "  variants: {},",
-        "  plugins: [],",
-        "}",
-      ].join("\n");
-      write(tailwindConfigPath, tailwindConfig);
       const question = "Would you like to use custom CSS with Tailwind?";
       if (await confirm(question, true)) {
         devDependencies.push("tailwindcss-cli");
+        const tailwindConfigPath = join(dir, "tailwind.config.js");
+        const tailwindConfig = [
+          'const colors = require("tailwindcss/colors");',
+          "",
+          "module.exports = {",
+          "  theme: {",
+          "    extend: {",
+          "      colors: {",
+          "        cyan: colors.cyan,",
+          "      },",
+          "    },",
+          "  },",
+          "  variants: {},",
+          "  plugins: [],",
+          "}",
+        ].join("\n");
+        write(tailwindConfigPath, tailwindConfig);
         const indexCss = [
           "@tailwind base;",
           "@tailwind components;",
@@ -304,7 +301,7 @@ export default async (dir: string, options: Options) => {
         }
       } else {
         await runLocalCommand(
-          "npx tailwindcss-cli@latest build -o src/tailwind.css",
+          "npx tailwindcss-cli@latest build -o public/index.css",
         );
       }
     } else if (pkg === "TypeScript") {
