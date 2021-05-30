@@ -73,13 +73,16 @@ const extendEsLintConfig = (
         "plugin:import/typescript",
       ],
       parser: "@typescript-eslint/parser",
-      plugins: [...base.plugins, "@typescript-eslint"],
+      parserOptions: { ...base.parserOptions, project: "tsconfig.json" },
+      plugins: [...base.plugins, "@typescript-eslint", "ts-exports"],
       rules: {
         ...base.rules,
+        "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-empty-function": [
           "error",
           { allow: ["arrowFunctions"] },
         ],
+        "ts-exports/unused-exports": "error",
       },
     };
   }

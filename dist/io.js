@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runCommand = exports.info = exports.write = exports.getTemplateFile = void 0;
+exports.runCommand = exports.write = exports.getTemplateFile = void 0;
 var chalk_1 = __importDefault(require("chalk"));
 var child_process_1 = require("child_process");
 var fs_1 = require("fs");
@@ -73,10 +73,6 @@ var write = function (path, text) {
     fs_1.writeFileSync(path, text);
 };
 exports.write = write;
-var info = function (content, log) {
-    return log(chalk_1.default.blue("i") + " " + content);
-};
-exports.info = info;
 var runCommand = function (command, dir, log, onCommandError) { return __awaiter(void 0, void 0, void 0, function () {
     var err_1;
     return __generator(this, function (_a) {

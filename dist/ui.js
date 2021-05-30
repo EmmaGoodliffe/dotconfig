@@ -14,8 +14,7 @@ var chalk_1 = __importDefault(require("chalk"));
 var input_1 = require("input");
 var divider = "---";
 var plainDividerCheckboxes = function (label, choices) {
-    var dividerChoices = __spreadArrays(choices);
-    dividerChoices.push({ name: divider, disabled: true });
+    var dividerChoices = __spreadArrays(choices, [{ name: divider, disabled: true }]);
     return input_1.checkboxes(label, dividerChoices);
 };
 var ui = {

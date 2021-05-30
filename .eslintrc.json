@@ -13,9 +13,10 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
-    "ecmaFeatures": { "impliedStrict": true }
+    "ecmaFeatures": { "impliedStrict": true },
+    "project": ["tsconfig.json", "**/tsconfig.json"]
   },
-  "plugins": ["prettier", "@typescript-eslint", "import"],
+  "plugins": ["prettier", "@typescript-eslint", "import", "ts-exports"],
   "rules": {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-empty-function": [
@@ -40,6 +41,7 @@
     "sort-imports": [
       "error",
       { "ignoreCase": true, "ignoreDeclarationSort": true }
-    ]
+    ],
+    "ts-exports/unused-exports": "error"
   }
 }

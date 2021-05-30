@@ -29,9 +29,6 @@ export const write = (path: string, text: string) => {
   writeFileSync(path, text);
 };
 
-export const info = (content: string, log: Options["ui"]["log"]) =>
-  log(`${chalk.blue("i")} ${content}`);
-
 export const runCommand = async (
   command: string,
   dir: string,
